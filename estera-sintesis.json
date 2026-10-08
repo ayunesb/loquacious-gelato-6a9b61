@@ -872,5 +872,60 @@
         "texto": "El corpus contiene versos sobre la creación del carácter, los dieciséis Odù, la deuda de sus madres y la ofrenda de Òràngúnméjì. Dafá reproduce un rezo de buena fortuna de Òrìṣànlá y un relato de Eléjiórangún. El rezo yorùbá muestra separaciones y acentos alterados por OCR; se conserva para cotejo antes de publicar una transcripción corregida."
       }
     ]
+  },
+  "17": {
+    "titulo": "Odù 17 · Ogbè Ọ̀yẹ̀kú",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ogbè Ọ̀yẹ̀kú plantea cómo concluir bien un camino que se abre. Dafá contrapone una terminación productiva con la interrupción prematura por falta de equilibrio. La ficha aconseja usar inteligencia y consejo antes que fuerza; el avance necesita alternar esfuerzo, descanso y atención al presente. Un pasaje cosmológico recuerda además la temporalidad de la vida humana."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Las historias permiten varias lecturas de la consulta:",
+        "puntos": [
+          "La persona invierte mucha energía en beneficios breves y necesita revisar qué resultado duradero busca.",
+          "Se abre una oportunidad, pero el trabajo sin descanso o una confrontación innecesaria puede cortarla antes de tiempo.",
+          "Ocupa una posición de autoridad o riqueza y cree que puede prescindir del consejo; la ficha advierte contra esa confianza excesiva.",
+          "Vive tensión entre deberes, descanso y disfrute. Dafá describe el equilibrio de saber cuándo trabajar, jugar o retirarse.",
+          "Afronta una disputa o un obstáculo en un viaje. El camaleón Alàgemo consulta cómo volver de una competencia con Olókun.",
+          "Tiene problemas de sueño o busca comprender un conflicto que cambia de manos, como en el relato de Olúkotún, Ọlọ́fin y el rey.",
+          "Medita sobre la muerte y el sentido de venir a la tierra; un verso presenta la tierra como mercado y el cielo como hogar."
+        ],
+        "cierre": "Estos pasajes pertenecen a fuentes y situaciones distintas; no predicen todos los hechos a una sola persona."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "El camino favorable es una conclusión productiva y proporcionada: progresar sin perder la capacidad de vivir el presente. Olúkotún recibe reconocimiento por su relación con Ifá en un relato; Alàgemo prepara su regreso después de medirse con Olókun. La imagen de Ogbè y Ọ̀yẹ̀kú unidos expresa una transformación que puede aprovecharse cuando se escucha consejo y se administra la energía."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La cara difícil es abrir un camino y dejarlo inconcluso por exceso de esfuerzo, falta de balance, orgullo o afán de imponerse. El relato de Alàgemo muestra que una competencia puede producir represalias y obstáculos en el retorno. El pasaje de Olúkotún incluye cesiones matrimoniales propias de su mundo narrativo; no debe convertirse en práctica actual ni consejo para disponer de otra persona."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Saber avanzar incluye saber detenerse. Dafá pone juntos trabajo, descanso, juego y retiro; la ficha contrapone inteligencia y confrontación. El verso cosmológico sobre la tierra como mercado amplía la perspectiva: los bienes y conflictos de una etapa no agotan el sentido de la vida."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Olúkotún atiende a Ifá antes de acudir a Ọlọ́fin; el conflicto por una joven y el insomnio reaparece después ante un rey. Alàgemo compite con Olókun en vestidos y busca un regreso seguro cuando surge oposición. Otro verso atribuido a Ogbè Ọ̀yẹ̀kú habla del acuerdo sobre Ikú y usa la imagen de la tierra como mercado. Son relatos separados, con propósitos diferentes."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "El relato de Olúkotún presenta una ofrenda que incluye chivas y cauríes y una cesión humana en la narración histórica, que no se propone como acción actual. Alàgemo recibe indicaciones distintas para la competencia y para el regreso. Dafá ofrece aquí principios de balance en iré e ibi, no una lista universal. Un texto de ẹbọ conserva un verso propio sobre Orí; sus materiales no se trasladan a todos los casos."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Ifá guía las decisiones de Olúkotún y Alàgemo. Olókun aparece como contraparte de Alàgemo, no como destinatario universal de una ofrenda. Orí figura en un rezo del signo; Olódùmarè e Ikú aparecen en el pasaje cosmológico. Esas relaciones se muestran según su función en cada texto."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "El relato de Alàgemo usa ropas de diversos colores, una estera de rafia y ñame machacado en contextos diferentes. También se nombran palomas, cauríes y cuentas. El verso cosmológico menciona el nudo de un árbol como imagen de resistencia. Ninguno de esos elementos se convierte por sí solo en una planta o una lista única del signo."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "Se conserva el verso del camaleón, el relato de Olúkotún, un rezo de Orí en un texto de ẹbọ, la serie de rezos y suyere titulada «Ogbe Yekun» y el verso cosmológico sobre tierra y cielo. Los repertorios escriben el nombre y el yorùbá de maneras distintas; varias líneas tienen OCR deteriorado y quedan pendientes de cotejo antes de ofrecer una versión corregida o una traducción nueva."
+      }
+    ]
   }
 }
