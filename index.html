@@ -2569,7 +2569,7 @@ async function cargarSintesisEstera(){
 function estSintesisHTML(id){
   const o = odus.find(x=>x.id===id), ficha = estSintesis?.[o?.numero];
   if(!ficha) return "";
-  return `<section class="est-synthesis" aria-label="Síntesis de ${esc(o.nombre)}"><h3>${esc(ficha.titulo)}</h3>${ficha.secciones.map(s=>`<section><h4>${esc(s.titulo)}</h4>${s.introduccion?`<p>${esc(s.introduccion)}</p>`:""}${s.texto?`<p>${esc(s.texto)}</p>`:""}${s.puntos?.length?`<ul>${s.puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${s.cierre?`<p>${esc(s.cierre)}</p>`:""}</section>`).join("")}</section>`;
+  return `<section class="est-synthesis" aria-label="Síntesis de ${esc(o.nombre)}"><h3>${esc(ficha.titulo)}</h3><p class="est-hint">Síntesis en revisión: contrasta el pasaje que corresponda a esta consulta.</p>${ficha.secciones.map(s=>`<section><h4>${esc(s.titulo)}</h4>${s.introduccion?`<p>${esc(s.introduccion)}</p>`:""}${s.texto?`<p>${esc(s.texto)}</p>`:""}${s.puntos?.length?`<ul>${s.puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${s.cierre?`<p>${esc(s.cierre)}</p>`:""}</section>`).join("")}</section>`;
 }
 const hoy = () => new Date().toLocaleDateString("en-CA");
 function estReset(){ est = {nombre: "", fecha: hoy(), slots: [null, null, null], notas: {}, selecciones: {}, activo: 0, q: "", tipoConsulta: "consulta", ori: "", tipo: "", ebbo: "", ebboTxt: "", motivo: "", para: "", cumplido: "", acepto: "", refran: "", prohib: "", leyo: "", obraA: "", obraTipo: "", hace: "", resumen: "", seguimiento: "", proxima: "", fEstado: [], fOrisha: "", fIta: "", fichaDirty: false, fichaMsg: "", editId: null}; estMsg = ""; }
