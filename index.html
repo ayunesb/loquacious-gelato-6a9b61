@@ -369,6 +369,16 @@ details.mas summary{cursor:pointer;font-weight:700;color:var(--green)}
 .bookhead{font-family:var(--serif);font-size:1.05rem;margin:0 0 10px;color:var(--green)}
 .booklist{list-style:none;margin:0;padding:0}
 .booklist li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.est-reading{border:1px solid var(--rule);border-radius:16px;padding:14px;background:var(--paper)}
+.est-reading details{border-top:1px solid var(--rule);padding:10px 0}
+.est-reading details:first-of-type{border-top:0}
+.est-reading summary{cursor:pointer;font-weight:700;color:var(--green)}
+.est-reading article{padding:12px 0;border-bottom:1px solid var(--rule)}
+.est-reading article:last-child{border-bottom:0}
+.est-reading .prose{white-space:pre-line;max-height:18em;overflow:auto;margin:8px 0}
+.est-reading .chosen{border-left:4px solid var(--green);padding-left:10px}
+.est-step{font-weight:700;color:var(--green);margin-right:8px}
+.est-hint{font-size:.9rem;color:var(--muted);margin:4px 0 12px}
 @media (max-width:820px){.jump{top:58px}}
 </style>
 </head>
@@ -946,6 +956,7 @@ function appendFooterLegal(){
   m.insertAdjacentHTML("beforeend", `<footer class="legalfoot">${legalLinks().map(([s,t])=>`<a href="/legal/${s}" target="_blank" rel="noopener">${t}</a>`).join("")}<span class="muted">· © ${new Date().getFullYear()} Odù de Ifá</span></footer>`);
 }
 function renderDetail(){ renderDetailInner(); appendFooterLegal(); bindPalabrasTabs(); }
+let volverAEstera = false;
 function renderDetailInner(){
   renderTabs();
   const app = $("#app");
@@ -984,6 +995,7 @@ function renderDetailInner(){
   const big = marksSVG(o.derecha,o.izquierda,200);
   $("#main").innerHTML = `
     <button class="btn back" id="back">Volver a la lista</button>
+    ${volverAEstera?`<button class="btn" id="backEstera" style="margin-left:8px">Volver a esta consulta</button>`:""}
     ${localOnly?notice():""}
     <header class="hero">
       <div>
@@ -1016,6 +1028,7 @@ function renderDetailInner(){
   };
   document.querySelectorAll("[data-irlibro]").forEach(b => b.onclick = () => setBook(b.dataset.irlibro));
   $("#back").onclick = () => select(null);
+  const be = $("#backEstera"); if(be) be.onclick = () => { volverAEstera = false; setView("estera"); };
   document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openEditor(o));
   document.querySelectorAll("[data-jump]").forEach(a => a.onclick = e => {
     e.preventDefault();
@@ -1473,7 +1486,7 @@ function setView(v){
   if((v === "estera" || v === "orichas") && lptIndex === null) lptCargar();
   renderDetail(); window.scrollTo(0,0);
 }
-function openOdu(id){ view = "biblioteca"; select(id); }
+function openOdu(id, desdeEstera=false){ volverAEstera = desdeEstera; view = "biblioteca"; select(id); }
 const volverBtn = () => `<button class="linkbtn l" data-volver aria-label="${tr("common.volver")}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>${tr("common.volver")}</button>`;
 const phead = (t, right) => `<div class="phead">${volverBtn()}<h1>${t}</h1><span class="r">${right||""}</span></div>`;
 document.addEventListener("click", e => { if(e.target.closest("[data-volver]")) goBack(); });
@@ -2519,9 +2532,9 @@ let expQ = "";
 const SINONIMOS = [[/\bicu\b/,"iku ikú"],[/\baro\b/,"arun"],[/\bello\b/,"eyo"],[/\billa\b/,"iña ina"],[/\bachecun\b|\bagheogun\b/,"ashegun"],[/\bna\b/,"ona"],[/\bosogbo\b/,"osorbo"]];
 function conSinonimos(t){ let x = t; for(const [re, s] of SINONIMOS) if(re.test(t)) x += " " + s; return x; }
 function hayConsulta(c){
-  return conSinonimos(norm([c.persona, c.motivo, c.orientacion==="ire"?"ire":c.orientacion==="osogbo"?"osogbo":"", c.orientacion_tipo, c.ebbo, c.ebbo_texto, c.ebbo_aceptado, c.prohibiciones, c.refran_dicho, c.leyo, c.obra_a, c.notas, c.seguimiento,
+  return conSinonimos(norm([c.persona, c.motivo, c.tipo_consulta, c.orientacion==="ire"?"ire":c.orientacion==="osogbo"?"osogbo":"", c.orientacion_tipo, c.ebbo, c.ebbo_texto, c.ebbo_aceptado, c.prohibiciones, c.refran_dicho, c.leyo, c.obra_a, c.notas, c.seguimiento,
     ...(c.signos||[]).map(s => { const o = odus.find(x => x.id === s); return o ? `${o.numero} ${o.nombre} ${o.otrosNombres} ${LEG[o.derecha]?.vars||""} ${LEG[o.izquierda]?.vars||""}` : s; }),
-    ...Object.values(c.notas_signos||{})].join(" ")));
+    ...Object.values(c.notas_signos||{}), ...Object.values(c.selecciones||{}).flat().map(x=>x.texto||"")].join(" ")));
 }
 function personasFiltradas(){
   const all = personas(); const q = norm(expQ);
@@ -2535,9 +2548,82 @@ function personasFiltradas(){
   }).filter(p => p.items.length);
 }
 let est = {nombre: "", fecha: "", slots: [null, null, null], notas: {}, activo: 0, q: ""}, expAbierto = null, estMsg = "";
+let estLecturas = {}, estLecturasCargando = new Set(), estCategoriaAbierta = "";
 const hoy = () => new Date().toLocaleDateString("en-CA");
-function estReset(){ est = {nombre: "", fecha: hoy(), slots: [null, null, null], notas: {}, activo: 0, q: "", ori: "", tipo: "", ebbo: "", ebboTxt: "", motivo: "", para: "", acepto: "", refran: "", prohib: "", leyo: "", obraA: "", obraTipo: "", hace: "", fEstado: [], fOrisha: "", fIta: "", fichaDirty: false, fichaMsg: "", editId: null}; estMsg = ""; }
+function estReset(){ est = {nombre: "", fecha: hoy(), slots: [null, null, null], notas: {}, selecciones: {}, activo: 0, q: "", tipoConsulta: "consulta", ori: "", tipo: "", ebbo: "", ebboTxt: "", motivo: "", para: "", cumplido: "", acepto: "", refran: "", prohib: "", leyo: "", obraA: "", obraTipo: "", hace: "", resumen: "", seguimiento: "", proxima: "", fEstado: [], fOrisha: "", fIta: "", fichaDirty: false, fichaMsg: "", editId: null}; estMsg = ""; }
 estReset(); cargarBorrador();
+function estFalta(){
+  if(!est.slots.some(Boolean)) return "Hace falta al menos un signo";
+  if(!est.nombre.trim()) return "Hace falta el nombre";
+  if(!est.ori) return "Hace falta cómo vino la letra";
+  if(!est.ebbo) return "Indica si se marcó ebbó";
+  if((est.ebbo === "pendiente" || est.ebbo === "cumplido") && !est.ebboTxt.trim()) return "Describe qué ebbó se marcó";
+  if(est.ebbo === "cumplido" && !est.cumplido) return "Indica cuándo se cumplió el ebbó";
+  return "";
+}
+function estActualizarGuardar(){
+  const falta = estFalta(), b = $("#estSave"), aviso = $("#estFalta");
+  if(b) b.disabled = !!falta;
+  if(aviso) aviso.textContent = falta;
+}
+async function cargarLecturaEstera(id){
+  if(!id || estLecturas[id] || estLecturasCargando.has(id)) return;
+  estLecturasCargando.add(id);
+  try{
+    const [t,c] = await Promise.all([
+      sb.from("textos").select("libro,caracterizacion,wo,caracteristicas,consejo,versos").eq("odu_id",id),
+      sb.from("canticos_rezos").select("libro,tipo,titulo,texto_original,traduccion,notas").eq("odu_id",id).limit(200)
+    ]);
+    if(t.error || c.error) throw t.error || c.error;
+    estLecturas[id] = {textos:t.data||[], canticos:c.data||[]};
+  }catch(e){ estLecturas[id] = {error:true, textos:[], canticos:[]}; }
+  finally{ estLecturasCargando.delete(id); if(view === "estera" && est.slots.includes(id)) renderDetail(); }
+}
+function estEntradas(id){
+  const d = estLecturas[id]; if(!d || d.error) return [];
+  const out = [], vistos = new Map();
+  const add = (categoria, texto, fuente) => {
+    const t = String(texto||"").trim(), k = categoria + "|" + t;
+    if(!t) return;
+    if(vistos.has(k)){ const x = vistos.get(k); if(fuente && !x.fuentes.includes(fuente)) x.fuentes.push(fuente); return; }
+    const x = {categoria, texto:t, fuentes:fuente?[fuente]:[]};
+    vistos.set(k,x); out.push(x);
+  };
+  for(const t of d.textos){
+    add("Caracterización",t.caracterizacion,t.libro); add("WO",t.wo,t.libro);
+    add("Características generales",t.caracteristicas,t.libro); add("Consejo",t.consejo,t.libro);
+    for(const v of (Array.isArray(t.versos)?t.versos:[])){
+      add("Versos en yorùbá · revisar transcripción",v.yoruba,t.libro);
+      add("Traducciones y comentarios · revisar antes de citar",v.traduccion,t.libro); add("Traducciones y comentarios · revisar antes de citar",v.comentario,t.libro);
+      add("Ebós mencionados",v.ebbo,t.libro); add("Plantas y hierbas",v.hierbas,t.libro);
+      add("Orichas relacionados",v.orichas,t.libro); add("Cánticos",v.canticos,t.libro);
+    }
+  }
+  for(const c of d.canticos){
+    add("Rezos y cánticos",[c.titulo,c.texto_original].filter(Boolean).join("\n"),c.libro);
+    add("Traducciones y comentarios · revisar antes de citar",c.traduccion,c.libro);
+  }
+  const casa = libreta[id] || {};
+  add("Refrán de la casa",casa.refran,"libreta-casa"); add("Qué nace",casa.nace,"libreta-casa");
+  add("Qué se suele marcar",casa.marca,"libreta-casa"); add("Qué no se hace",casa.nohace,"libreta-casa");
+  return out;
+}
+function estLecturaHTML(id){
+  const d = estLecturas[id];
+  if(!d) return `<p class="muted">Cargando la lectura de este Odù…</p>`;
+  if(d.error) return `<p class="muted">No se pudo cargar la lectura.</p><button class="btn" id="estReintentarLectura">Reintentar</button>`;
+  const entradas = estEntradas(id), elegidas = est.selecciones?.[id] || [];
+  if(!entradas.length) return `<p class="muted">Este Odù aún no tiene contenido cargado para esta lectura.</p>`;
+  const categorias = [...new Set(entradas.map(e=>e.categoria))];
+  return `<p class="est-hint">Marca solo los pasajes que se confirmaron en esta consulta. Los textos son material de apoyo; revisa las transcripciones yorùbá y traducciones antes de citarlas. Ningún ebbó se indica automáticamente.</p>
+    ${categorias.map(cat=>{
+      const items = entradas.map((e,i)=>({...e,i})).filter(e=>e.categoria===cat);
+      return `<details ${estCategoriaAbierta===cat?"open":""}><summary>${esc(cat)} · ${items.length}</summary>${items.map(e=>{
+        const marcado = elegidas.some(x=>x.categoria===e.categoria && x.texto===e.texto);
+        return `<article class="${marcado?"chosen":""}"><p class="prose">${esc(e.texto)}</p><button class="btn" data-estsel="${e.i}" aria-pressed="${marcado}">${marcado?"✓ Aplica a esta consulta":"Marcar si aplica"}</button></article>`;
+      }).join("")}</details>`;
+    }).join("")}`;
+}
 function buscarOdus(q){
   const t = norm(q); if(!t) return [];
   const n = /^\d+$/.test(t) ? parseInt(t,10) : null;
@@ -2612,6 +2698,12 @@ async function cumplirEbbo(id, b){
   if(b) b.disabled = true;
   try{
     const c0 = consultas.find(x => x.id === id); const {user_id, ...base} = c0 || {id};
+    if(!c0?.ebbo_texto?.trim()){
+      if(b) b.disabled = false;
+      abrirEnEstera(c0);
+      alert("Antes de marcarlo cumplido, escribe qué ebbó se marcó.");
+      return;
+    }
     const d = await upsertRow("consultas", {...base, ebbo: "cumplido", ebbo_cumplido: hoy(), estado: "cerrada", actualizado: new Date().toISOString()});
     consultas = consultas.map(x => x.id === d.id ? {...x, ...d} : x); espejo(); renderDetail();
   }catch(e){ if(b) b.disabled = false; alert("No se guardó. Revisa tu conexión."); }
@@ -2633,7 +2725,7 @@ function hojaHTML(k){
   const p = personas().find(x => x.k === k); if(!p) return null;
   const e = s => esc(s);
   const filas = [...p.items].sort((a,b) => (a.fecha||"").localeCompare(b.fecha||"")).map(c => `
-    <section><h2>${fmtFecha(c.fecha)}${c.tradicion?` · ${e(c.tradicion)}`:""}</h2>
+    <section><h2>${fmtFecha(c.fecha)}${c.tradicion?` · ${e(c.tradicion)}`:""}${c.tipo_consulta?` · ${e(c.tipo_consulta)}`:""}</h2>
       <table>${(c.signos||[]).map((s,i) => `<tr><th>${PUESTO_TXT[i]||"Otro"}</th><td>${e(oduName(s))}${(c.notas_signos||{})[s]?`<div class="n">${e(c.notas_signos[s])}</div>`:""}</td></tr>`).join("")}
       ${c.orientacion?`<tr><th>Viene en</th><td>${oriTxt(c)}${c.orientacion_tipo?` · ${e(c.orientacion_tipo)}`:""}</td></tr>`:""}
       ${c.ebbo?`<tr><th>Ebbó</th><td>${e(c.ebbo)}${c.ebbo==="cumplido"&&c.ebbo_cumplido?` (${fmtFecha(c.ebbo_cumplido)})`:""}${c.ebbo_texto?`<div>${e(c.ebbo_texto)}</div>`:""}</td></tr>`:""}
@@ -2645,6 +2737,7 @@ function hojaHTML(k){
       ${c.leyo?`<tr><th>Leyó</th><td>${e(c.leyo)}</td></tr>`:""}
       ${c.motivo?`<tr><th>Vino por</th><td>${e(c.motivo)}</td></tr>`:""}
       ${c.notas?`<tr><th>Notas</th><td>${e(c.notas)}</td></tr>`:""}
+      ${Object.values(c.selecciones||{}).flat().length?`<tr><th>Confirmado en la lectura</th><td>${Object.values(c.selecciones).flat().map(x=>`<p><b>${e(x.categoria||"")}</b>: ${e(x.texto||"")}</p>`).join("")}</td></tr>`:""}
       ${c.seguimiento?`<tr><th>Seguimiento</th><td>${e(c.seguimiento)}</td></tr>`:""}</table></section>`).join("");
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Expediente · ${e(p.nombre)}</title>
     <style>body{font-family:Georgia,serif;color:#1C2B22;max-width:760px;margin:30px auto;padding:0 20px;line-height:1.5}
@@ -2742,15 +2835,17 @@ document.addEventListener("keydown", e => {
   if(e.key === "ArrowRight"){ e.preventDefault(); moverSigno(1); }
 });
 function guardarBorrador(){ try{ const {q, ...x} = est; localStorage.setItem("odu.estera", JSON.stringify(x)); }catch(e){} }
-function cargarBorrador(){ try{ const d = JSON.parse(localStorage.getItem("odu.estera") || "null"); if(d && Array.isArray(d.slots)) est = {...est, ...d, q: ""}; }catch(e){} }
+function cargarBorrador(){ try{ const d = JSON.parse(localStorage.getItem("odu.estera") || "null"); if(d && Array.isArray(d.slots)) est = {...est, ...d, selecciones:d.selecciones && typeof d.selecciones === "object" ? d.selecciones : {}, q: ""}; }catch(e){} }
 function abrirEnEstera(c){
   estReset();
   est.editId = c.id; est.nombre = c.persona || ""; est.fecha = c.fecha || hoy();
   est.slots = [0,1,2].map(i => (c.signos||[])[i] || null); est.notas = {...(c.notas_signos||{})};
+  est.selecciones = {...(c.selecciones||{})}; est.tipoConsulta = c.tipo_consulta || "consulta";
   est.activo = Math.max(0, est.slots.findIndex(s => !s)); if(est.slots.every(Boolean)) est.activo = 0;
   est.ori = c.orientacion || ""; est.tipo = c.orientacion_tipo || ""; est.ebbo = c.ebbo || ""; est.ebboTxt = c.ebbo_texto || "";
-  est.motivo = c.motivo || ""; est.para = c.ebbo_para || ""; est.acepto = c.ebbo_aceptado || ""; est.refran = c.refran_dicho || "";
+  est.motivo = c.motivo || ""; est.para = c.ebbo_para || ""; est.cumplido = c.ebbo_cumplido || ""; est.acepto = c.ebbo_aceptado || ""; est.refran = c.refran_dicho || "";
   est.prohib = c.prohibiciones || ""; est.leyo = c.leyo || ""; est.hace = c.obra_hace || "";
+  est.resumen = c.notas || ""; est.seguimiento = c.seguimiento || ""; est.proxima = c.proxima_fecha || "";
   est.obraTipo = c.obra_a === "Egun" ? "egun" : c.obra_a ? "orisha" : ""; est.obraA = c.obra_a && c.obra_a !== "Egun" && c.obra_a !== "Orisha" ? c.obra_a : "";
   cargarFichaEnEstera();
   setView("estera"); window.scrollTo(0,0);
@@ -2870,15 +2965,24 @@ $("#shCopy").onclick = async () => {
 function renderEstera(){
   if(!user){ $("#main").innerHTML = needLogin(tr("estera.titulo")); bindGoLogin(); return; }
   const n = est.slots.filter(Boolean).length;
-  const falta = n === 0 ? "Hace falta al menos un signo" : !est.nombre.trim() ? "Hace falta el nombre" : !est.ori ? "Hace falta cómo vino la letra" : "";
+  const falta = estFalta();
   const listo = !falta;
   const visibles = est.slots[1] ? 3 : est.slots[0] ? 2 : 1;
-  const act = est.slots[est.activo];
+  const act = est.slots[est.activo] || est.slots.find(Boolean);
+  for(const id of est.slots.filter(Boolean)) cargarLecturaEstera(id);
   const res = buscarOdus(est.q);
   const lista = personasFiltradas();
   $("#main").innerHTML = `<div class="page">
     ${phead("Estera", `<button class="linkbtn muted" id="estOtra">Otra persona</button>`)}
-    <p class="sub">El expediente guarda el nombre, la fecha, si la letra vino en iré o en osogbo, y si el ebbó sigue pendiente. De un signo a tres. Es privado: solo tú lo ves.<br><span style="font-size:.9rem">${estadoGuardado()}</span></p>
+    <p class="sub">Registra la lectura de uno a tres signos de Ifá. Marca solamente lo confirmado para esta persona; la información de los libros es apoyo para el lector.<br><span style="font-size:.9rem">${estadoGuardado()}</span></p>
+    <section class="blk"><h3><span class="est-step">1</span>Contexto de la consulta</h3>
+      <div class="grid2">
+        <div class="field"><label for="estTipoConsulta">Tipo de consulta</label><select id="estTipoConsulta"><option value="consulta" ${est.tipoConsulta==="consulta"?"selected":""}>Consulta ordinaria de Ifá</option><option value="ita" ${est.tipoConsulta==="ita"?"selected":""}>Itá de Ifá</option><option value="seguimiento" ${est.tipoConsulta==="seguimiento"?"selected":""}>Seguimiento</option><option value="otra" ${est.tipoConsulta==="otra"?"selected":""}>Otra lectura de Ifá</option></select></div>
+        <div class="field"><label for="estLeyo">Quién leyó</label><input id="estLeyo" value="${esc(est.leyo)}"></div>
+      </div>
+      <div class="field"><label for="estMotivo">Por qué vino</label><input id="estMotivo" value="${esc(est.motivo)}" placeholder="Motivo de la consulta, si se conoce"></div>
+      <p class="est-hint">Esta Estera registra Odù de Ifá. Los signos de caracoles requieren su propio catálogo y reglas de lectura.</p>
+    </section>
     <div class="grid2" style="grid-template-columns:1fr 220px">
       <div class="field"><label for="estNom">Nombre</label><input id="estNom" list="personasList" value="${esc(est.nombre)}" placeholder="Nombre o apodo de referencia"><datalist id="personasList">${lista.map(p=>`<option value="${esc(p.nombre)}">`).join("")}</datalist></div>
       <div class="field"><label for="estFecha">Fecha</label><input id="estFecha" type="date" value="${esc(est.fecha)}"></div>
@@ -2892,6 +2996,7 @@ function renderEstera(){
       ${(()=>{const pr = est.nombre.trim() ? prohibidoDe(claveDe(est.nombre)) : []; return pr.length ? `<p class="tlx"><b>Prohibido en sus letras:</b> ${pr.map(x=>esc(x.t)).join(" · ")}</p>` : "";})()}
       <div style="display:flex;gap:10px;align-items:center"><button class="linkbtn ${est.nombre.trim()?"":"muted"}" id="estFichaSave" ${est.nombre.trim()?"":"disabled"}>Guardar ficha</button><span class="muted" id="fichaMsg">${est.fichaMsg||""}</span></div>
     </section>
+    <section class="blk"><h3><span class="est-step">2</span>Signos de esta lectura</h3><p class="est-hint">Elige el signo que habla y, si corresponde, los que acompañan y testifican. Toca una ficha para escribir su nota.</p></section>
     <div class="slots" style="grid-template-columns:${[1.5,1,1].slice(0, visibles).map(x=>`minmax(0,${x}fr)`).join(" ")}">${est.slots.slice(0, visibles).map((s,i) => {
       const o = s && odus.find(x => x.id === s);
       const lib = s ? libreta[s] : null;
@@ -2905,31 +3010,31 @@ function renderEstera(){
     <div class="results">${res.map(o => `<button data-pick="${o.id}"><span><b>${o.numero}</b> · ${esc(o.nombre)} <span class="muted">${esc(o.otrosNombres||"")}</span></span>${marksSVG(o.derecha,o.izquierda,28)}</button>`).join("")}</div>
     <p style="margin:6px 0 0"><button class="linkbtn" id="estTrazar">Trazar el signo</button></p>
 
-    <section class="blk"><h3>Cómo vino la letra</h3>
+    <section class="blk"><h3><span class="est-step">3</span>Cómo vino la letra</h3>
       <div class="ori" style="margin:0"><div class="seg"><button class="ire" data-ori="ire" aria-pressed="${est.ori==="ire"}">Iré</button><button class="osg" data-ori="osogbo" aria-pressed="${est.ori==="osogbo"}">Osogbo</button></div>
       ${est.ori ? `<div class="field"><select id="estTipo" aria-label="De qué tipo">${tipoOptions(est.ori, est.tipo)}</select></div>${lptTipoNota(est.ori, est.tipo)}` : ""}</div>
     </section>
 
-    <section class="blk"><h3>Ebbó</h3>
+    ${act?`<section class="blk"><h3><span class="est-step">4</span>Lectura de ${esc(oduName(act))}</h3><div class="est-reading">${estLecturaHTML(act)}</div></section>`:""}
+
+    <section class="blk"><h3><span class="est-step">5</span>Ebbó confirmado</h3><p class="est-hint">Registra únicamente la obra que se marcó en esta consulta; las mencionadas en los libros son referencias.</p>
       <div class="seg">${[["pendiente","Pendiente"],["cumplido","Cumplido"],["no marcó","No se marcó"]].map(([v,t])=>`<button class="neu" data-ebbo="${v}" aria-pressed="${est.ebbo===v}">${t}</button>`).join("")}</div>
-      ${est.ebbo !== "no marcó" ? `<div class="field" style="margin-top:14px"><label for="estEbboTxt">Qué se marcó</label><input id="estEbboTxt" value="${esc(est.ebboTxt)}"></div>` : ""}
+      ${est.ebbo && est.ebbo !== "no marcó" ? `<div class="field" style="margin-top:14px"><label for="estEbboTxt">Qué se marcó</label><textarea id="estEbboTxt" required>${esc(est.ebboTxt)}</textarea></div>
+      <div class="grid2"><div class="field"><label for="estPara">Para cuándo es la obra</label><input id="estPara" type="date" value="${esc(est.para)}"></div>${est.ebbo==="cumplido"?`<div class="field"><label for="estCumplido">Cuándo se cumplió</label><input id="estCumplido" type="date" value="${esc(est.cumplido)}"></div>`:""}</div>
+      <div class="field"><label>Si la obra fue aceptada</label><div class="seg">${[["aceptó","Aceptó"],["no aceptó","No aceptó"],["no se preguntó","No se preguntó"]].map(([v,t])=>`<button class="neu" data-acepto="${v}" aria-pressed="${est.acepto===v}">${t}</button>`).join("")}</div></div>
+      <div class="field"><label>A quién iba</label><div class="ori" style="margin:0"><div class="seg">${[["orisha","Orisha"],["egun","Egun"]].map(([v,t])=>`<button class="neu" data-obra="${v}" aria-pressed="${est.obraTipo===v}">${t}</button>`).join("")}</div>
+        ${est.obraTipo==="orisha" ? `<input id="estObraA" list="orishaList" value="${esc(est.obraA)}" placeholder="Cuál orisha" style="border:1px solid var(--rule);border-radius:12px;padding:10px 12px;background:var(--paper)"><datalist id="orishaList">${ORISHAS.filter(o=>o!=="Egun").map(o=>`<option value="${esc(o)}">`).join("")}</datalist>` : ""}</div></div>
+      <div class="field"><label>Quién hace la obra</label><div class="seg">${[["la persona","La persona"],["el padrino","El padrino"]].map(([v,t])=>`<button class="neu" data-hace="${v}" aria-pressed="${est.hace===v}">${t}</button>`).join("")}</div></div>` : ""}
     </section>
 
-    <section class="blk"><h3>Esta consulta</h3>
-      <div class="grid2">
-        <div class="field"><label for="estMotivo">Por qué vino</label><input id="estMotivo" value="${esc(est.motivo)}" placeholder="Un viaje, la salud de la madre…"></div>
-        <div class="field"><label for="estPara">Para cuándo es la obra</label><input id="estPara" type="date" value="${esc(est.para)}"></div>
-      </div>
+    <section class="blk"><h3><span class="est-step">6</span>Conclusión y seguimiento</h3>
       <div class="grid2">
         <div class="field"><label for="estRefran">Refrán que se dijo</label><input id="estRefran" value="${esc(est.refran)}"></div>
         <div class="field"><label for="estProhib">Qué se le prohibió</label><input id="estProhib" value="${esc(est.prohib)}"></div>
       </div>
-      <div class="field"><label for="estLeyo">Quién leyó</label><input id="estLeyo" value="${esc(est.leyo)}"></div>
-      <div class="field"><label>Si la obra fue aceptada</label><div class="seg">${[["aceptó","Aceptó"],["no aceptó","No aceptó"],["no se preguntó","No se preguntó"]].map(([v,t])=>`<button class="neu" data-acepto="${v}" aria-pressed="${est.acepto===v}">${t}</button>`).join("")}</div></div>
-      <div class="field"><label>A quién iba</label><div class="ori" style="margin:0"><div class="seg">${[["orisha","Orisha"],["egun","Egun"]].map(([v,t])=>`<button class="neu" data-obra="${v}" aria-pressed="${est.obraTipo===v}">${t}</button>`).join("")}</div>
-        ${est.obraTipo==="orisha" ? `<input id="estObraA" list="orishaList" value="${esc(est.obraA)}" placeholder="Cuál orisha" style="border:1px solid var(--rule);border-radius:12px;padding:10px 12px;background:var(--paper)"><datalist id="orishaList">${ORISHAS.filter(o=>o!=="Egun").map(o=>`<option value="${esc(o)}">`).join("")}</datalist>` : ""}</div></div>
-      <div class="field"><label>Quién hace la obra</label><div class="seg">${[["la persona","La persona"],["el padrino","El padrino"]].map(([v,t])=>`<button class="neu" data-hace="${v}" aria-pressed="${est.hace===v}">${t}</button>`).join("")}</div></div>
       <div class="field"><label for="estNota">Nota de esta letra${act?` <span class="muted">(${esc(oduName(act))})</span>`:""}</label><textarea id="estNota" ${act?"":"disabled placeholder=\"Elige primero un signo\""}>${act?esc(est.notas[act]||""):""}</textarea></div>
+      <div class="field"><label for="estResumen">Consejo final confirmado</label><textarea id="estResumen" placeholder="Redacta aquí lo que realmente se dijo a la persona">${esc(est.resumen)}</textarea></div>
+      <div class="grid2"><div class="field"><label for="estSeguimiento">Seguimiento</label><input id="estSeguimiento" value="${esc(est.seguimiento)}"></div><div class="field"><label for="estProxima">Próxima fecha</label><input id="estProxima" type="date" value="${esc(est.proxima)}"></div></div>
     </section>
 
     <div style="display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap"><button class="btn primary" id="estSave" ${listo?"":"disabled"}>${est.editId ? "Actualizar esta letra" : "Guardar en el expediente"}</button>${est.editId?`<button class="linkbtn muted" id="estNoEdit">Dejar de editar</button>`:""}<span class="muted" id="estFalta">${falta}</span>${estMsg?`<span style="color:var(--green);font-weight:700">${esc(estMsg)}</span>`:""}</div>
@@ -2941,10 +3046,13 @@ function renderEstera(){
       ${consultas === null ? `<p class="muted">Cargando…</p>` : lista.length ? lista.map(p => `<div class="person">
         <button data-per="${esc(p.k)}"><span class="who" style="font-family:var(--serif);font-size:1.2rem;font-weight:700">${esc(p.nombre)}</span><span class="muted">${p.items.length} ${p.items.length===1?"consulta":"consultas"} · última ${fmtFecha(p.ultima)}${(()=>{const k=p.items.filter(c=>c.ebbo==="pendiente").length;return k?` · <b style="color:#6B4C00">${k} ebbó pendiente${k>1?"s":""}</b>`:""})()}</span></button>
         ${(expAbierto === p.k || expQ.trim()) ? `<div class="timeline">${fichas[p.k] ? fichaHTML(p.k, true) : ""}${p.items.map(c => `<div class="tl"><span class="muted">${fmtFecha(c.fecha)}</span>
-          <div>${c.motivo?`<p class="tlx" style="margin:0 0 4px"><b>Vino por:</b> ${esc(c.motivo)}</p>`:""}<div class="chips" style="margin-bottom:6px">${oriBadge(c)} ${ebboLine(c)}${c.ebbo_para?` <span class="badge pend">para ${fmtCorta(c.ebbo_para)}</span>`:""}${c.ebbo_aceptado?` <span class="badge ${c.ebbo_aceptado==="aceptó"?"acc":c.ebbo_aceptado==="no aceptó"?"noacc":"cerrada"}">${esc(c.ebbo_aceptado==="no se preguntó"?"no se preguntó":c.ebbo_aceptado)}</span>`:""}</div>
+          <div>${c.tipo_consulta?`<p class="tlx muted" style="margin:0 0 4px">${esc(c.tipo_consulta === "ita" ? "Itá" : c.tipo_consulta === "consulta" ? "Consulta ordinaria" : c.tipo_consulta)}</p>`:""}${c.motivo?`<p class="tlx" style="margin:0 0 4px"><b>Vino por:</b> ${esc(c.motivo)}</p>`:""}<div class="chips" style="margin-bottom:6px">${oriBadge(c)} ${ebboLine(c)}${c.ebbo_para?` <span class="badge pend">para ${fmtCorta(c.ebbo_para)}</span>`:""}${c.ebbo_aceptado?` <span class="badge ${c.ebbo_aceptado==="aceptó"?"acc":c.ebbo_aceptado==="no aceptó"?"noacc":"cerrada"}">${esc(c.ebbo_aceptado==="no se preguntó"?"no se preguntó":c.ebbo_aceptado)}</span>`:""}</div>
           <div class="chips">${(c.signos||[]).map((s,i) => `<span class="chip link" data-odu="${esc(s)}" title="${esc((c.notas_signos||{})[s]||"")}"><b>${PUESTOS[i]||""}:</b> ${esc(oduName(s))}${(c.notas_signos||{})[s]?" ·":""}</span>`).join("") || `<span class="muted">Sin signos</span>`}</div>
           ${c.refran_dicho?`<p class="tlx" style="font-style:italic">“${esc(c.refran_dicho)}”</p>`:""}
           ${c.prohibiciones?`<p class="tlx"><b>Prohibido:</b> ${esc(c.prohibiciones)}</p>`:""}
+          ${c.notas?`<p class="tlx"><b>Consejo confirmado:</b> ${esc(c.notas)}</p>`:""}
+          ${Object.values(c.selecciones||{}).flat().length?`<p class="tlx muted">${Object.values(c.selecciones).flat().length} pasaje(s) marcados como aplicables</p>`:""}
+          ${c.seguimiento?`<p class="tlx"><b>Seguimiento:</b> ${esc(c.seguimiento)}</p>`:""}
           ${c.obra_a||c.obra_hace||c.leyo?`<p class="tlx muted">${[c.obra_a?`Obra a ${esc(c.obra_a)}`:"", c.obra_hace?`la hace ${esc(c.obra_hace)}`:"", c.leyo?`leyó ${esc(c.leyo)}`:""].filter(Boolean).join(" · ")}</p>`:""}
 </div>
           <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-abrir="${esc(c.id)}">Abrir</button>${c.ebbo==="pendiente"?`<button class="btn" data-cumplir="${esc(c.id)}">Marcar cumplido</button>`:""}<button class="btn" data-sharec="${esc(c.id)}">Compartir</button><button class="btn danger" data-borrarc="${esc(c.id)}">Borrar</button></span></div>`).join("")}
@@ -2952,20 +3060,28 @@ function renderEstera(){
       </div>`).join("") : `<p class="muted">Todavía no hay ninguno. Escribe el nombre, marca la letra y guárdala.</p>`}
     </div></div>`;
   $("#estNom").oninput = e => { est.nombre = e.target.value; estMsg = "";
-    const n2 = est.slots.filter(Boolean).length, f2 = n2 === 0 ? "Hace falta al menos un signo" : !est.nombre.trim() ? "Hace falta el nombre" : !est.ori ? "Hace falta cómo vino la letra" : "";
-    $("#estSave").disabled = !!f2; $("#estFalta").textContent = f2;
+    guardarBorrador();
+    estActualizarGuardar();
     const fb = $("#estFichaSave"); if(fb){ fb.disabled = !est.nombre.trim(); fb.classList.toggle("muted", !est.nombre.trim()); } };
+  $("#estTipoConsulta").onchange = e => { est.tipoConsulta = e.target.value; guardarBorrador(); };
   document.querySelectorAll("[data-estado]").forEach(b => b.onclick = () => { const s = b.dataset.estado; est.fEstado = est.fEstado.includes(s) ? est.fEstado.filter(x => x !== s) : [...est.fEstado, s]; est.fichaDirty = true; est.fichaMsg = ""; renderDetail(); });
   const o2 = $("#estOri2"); if(o2) o2.oninput = () => { est.fOrisha = o2.value; est.fichaDirty = true; };
   const it = $("#estIta"); if(it) it.oninput = () => { est.fIta = it.value; est.fichaDirty = true; };
   const fs = $("#estFichaSave"); if(fs) fs.onclick = async () => { const ok = await guardarFichaEstera(); est.fichaMsg = ok ? "Ficha guardada." : "No se guardó la ficha."; renderDetail(); };
   document.querySelectorAll("[data-obra]").forEach(b => b.onclick = () => { est.obraTipo = est.obraTipo === b.dataset.obra ? "" : b.dataset.obra; if(est.obraTipo !== "orisha") est.obraA = ""; renderDetail(); });
   document.querySelectorAll("[data-ori]").forEach(b => b.onclick = () => { if(est.ori !== b.dataset.ori){ est.ori = b.dataset.ori; est.tipo = ""; } renderDetail(); });
-  document.querySelectorAll("[data-ebbo]").forEach(b => b.onclick = () => { est.ebbo = est.ebbo === b.dataset.ebbo ? "" : b.dataset.ebbo; renderDetail(); });
-  const et = $("#estEbboTxt"); if(et) et.oninput = () => { est.ebboTxt = et.value; };
-  const bindIn = (sel, key) => { const el = $(sel); if(el) el.oninput = () => { est[key] = el.value; }; };
-  bindIn("#estMotivo","motivo"); bindIn("#estPara","para"); bindIn("#estRefran","refran"); bindIn("#estProhib","prohib"); bindIn("#estLeyo","leyo"); bindIn("#estObraA","obraA");
+  document.querySelectorAll("[data-ebbo]").forEach(b => b.onclick = () => {
+    est.ebbo = est.ebbo === b.dataset.ebbo ? "" : b.dataset.ebbo;
+    if(est.ebbo === "cumplido" && !est.cumplido) est.cumplido = hoy();
+    if(est.ebbo === "no marcó"){ est.ebboTxt = ""; est.para = ""; est.cumplido = ""; est.acepto = ""; est.obraTipo = ""; est.obraA = ""; est.hace = ""; }
+    renderDetail();
+  });
+  const et = $("#estEbboTxt"); if(et) et.oninput = () => { est.ebboTxt = et.value; guardarBorrador(); estActualizarGuardar(); };
+  const bindIn = (sel, key) => { const el = $(sel); if(el) el.oninput = () => { est[key] = el.value; guardarBorrador(); }; };
+  bindIn("#estMotivo","motivo"); bindIn("#estPara","para"); bindIn("#estRefran","refran"); bindIn("#estProhib","prohib"); bindIn("#estLeyo","leyo"); bindIn("#estObraA","obraA"); bindIn("#estResumen","resumen"); bindIn("#estSeguimiento","seguimiento"); bindIn("#estProxima","proxima");
   const ep = $("#estPara"); if(ep) ep.onchange = () => { est.para = ep.value; };
+  const ec = $("#estCumplido"); if(ec) ec.onchange = () => { est.cumplido = ec.value; estActualizarGuardar(); };
+  const ex = $("#estProxima"); if(ex) ex.onchange = () => { est.proxima = ex.value; };
   document.querySelectorAll("[data-acepto]").forEach(b => b.onclick = () => { est.acepto = est.acepto === b.dataset.acepto ? "" : b.dataset.acepto; renderDetail(); });
   document.querySelectorAll("[data-hace]").forEach(b => b.onclick = () => { est.hace = est.hace === b.dataset.hace ? "" : b.dataset.hace; renderDetail(); });
   document.querySelectorAll("[data-ficha]").forEach(b => b.onclick = () => openFicha(b.dataset.ficha, est.nombre.trim()));
@@ -2980,20 +3096,32 @@ function renderEstera(){
     el.onclick = e => { if(e.target.closest("[data-quitar],[data-leer]")) return; go(); };
     el.onkeydown = e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } };
   });
-  document.querySelectorAll("[data-leer]").forEach(b => b.onclick = () => openOdu(b.dataset.leer));
+  document.querySelectorAll("[data-leer]").forEach(b => b.onclick = () => { guardarBorrador(); openOdu(b.dataset.leer, true); });
   document.querySelectorAll("[data-quitar]").forEach(b => b.onclick = () => { const i = +b.dataset.quitar; delete est.notas[est.slots[i]]; est.slots[i] = null; est.activo = i; renderDetail(); });
   const q = $("#estQ");
   q.oninput = () => { est.q = q.value; const pos = q.selectionStart; renderDetail(); const q2 = $("#estQ"); q2.focus(); q2.setSelectionRange(pos,pos); };
   q.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); const r = buscarOdus(est.q); if(r[0]) estPoner(r[0].id); } };
   document.querySelectorAll("[data-pick]").forEach(b => b.onclick = () => estPoner(b.dataset.pick));
   $("#estTrazar").onclick = () => { trazaDestino = "estera"; trazaReset(); setView("trazar"); };
-  const nt = $("#estNota"); if(nt) nt.oninput = () => { if(nt.value.trim()) est.notas[act] = nt.value; else delete est.notas[act]; };
+  const nt = $("#estNota"); if(nt) nt.oninput = () => { if(nt.value.trim()) est.notas[act] = nt.value; else delete est.notas[act]; guardarBorrador(); };
+  document.querySelectorAll("[data-estsel]").forEach(b => b.onclick = () => {
+    const e = estEntradas(act)[+b.dataset.estsel]; if(!e) return;
+    estCategoriaAbierta = e.categoria;
+    const actual = est.selecciones[act] || [];
+    const marcado = actual.some(x=>x.categoria===e.categoria && x.texto===e.texto);
+    est.selecciones[act] = marcado ? actual.filter(x=>x.categoria!==e.categoria || x.texto!==e.texto) : [...actual,e];
+    guardarBorrador(); renderDetail();
+  });
+  const retry = $("#estReintentarLectura"); if(retry) retry.onclick = () => { delete estLecturas[act]; cargarLecturaEstera(act); renderDetail(); };
   $("#estSave").onclick = async () => {
+    if(estFalta()){ estActualizarGuardar(); return; }
     const signos = est.slots.filter(Boolean);
-    const row = {fecha: est.fecha || hoy(), persona: est.nombre.trim(), signos, estado: est.ebbo === "pendiente" ? "en seguimiento" : "abierta",
-      motivo: est.motivo.trim(), refran_dicho: est.refran.trim(), prohibiciones: est.prohib.trim(), leyo: est.leyo.trim(), obra_a: est.obraTipo === "egun" ? "Egun" : est.obraTipo === "orisha" ? (est.obraA.trim() || "Orisha") : "", obra_hace: est.hace,
-      ebbo_para: est.ebbo !== "no marcó" && est.para ? est.para : null, ebbo_aceptado: est.acepto,
-      orientacion: est.ori, orientacion_tipo: est.tipo, ebbo: est.ebbo, ebbo_texto: est.ebbo !== "no marcó" ? est.ebboTxt.trim() : "", ebbo_cumplido: est.ebbo === "cumplido" ? (est.fecha || hoy()) : null,
+    const row = {fecha: est.fecha || hoy(), persona: est.nombre.trim(), signos, estado: est.ebbo === "pendiente" ? "en seguimiento" : est.ebbo === "cumplido" ? "cerrada" : "abierta",
+      motivo: est.motivo.trim(), refran_dicho: est.refran.trim(), prohibiciones: est.prohib.trim(), leyo: est.leyo.trim(), obra_a: est.ebbo === "no marcó" ? "" : est.obraTipo === "egun" ? "Egun" : est.obraTipo === "orisha" ? (est.obraA.trim() || "Orisha") : "", obra_hace: est.ebbo === "no marcó" ? "" : est.hace,
+      ebbo_para: est.ebbo !== "no marcó" && est.para ? est.para : null, ebbo_aceptado: est.ebbo !== "no marcó" ? est.acepto : "",
+      orientacion: est.ori, orientacion_tipo: est.tipo, ebbo: est.ebbo, ebbo_texto: est.ebbo !== "no marcó" ? est.ebboTxt.trim() : "", ebbo_cumplido: est.ebbo === "cumplido" ? est.cumplido : null,
+      tradicion: "Ifá", tipo_consulta: est.tipoConsulta, notas: est.resumen.trim(), seguimiento: est.seguimiento.trim(), proxima_fecha: est.proxima || null,
+      selecciones: Object.fromEntries(signos.filter(s => est.selecciones[s]?.length).map(s => [s, est.selecciones[s]])),
       notas_signos: Object.fromEntries(signos.filter(s => est.notas[s]).map(s => [s, est.notas[s]]))};
     $("#estSave").disabled = true;
     try{
@@ -3025,11 +3153,16 @@ function renderEstera(){
         lin(); lin("- " + fmtFecha(c.fecha) + (c.motivo ? " · vino por: " + c.motivo : ""));
         (c.signos||[]).forEach((s,i) => lin("  " + (PUESTO_TXT[i]||"Otro") + ": " + oduName(s) + ((c.notas_signos||{})[s] ? " (" + c.notas_signos[s] + ")" : "")));
         if(c.orientacion) lin("  Viene en: " + oriTxt(c) + (c.orientacion_tipo ? " · " + c.orientacion_tipo : ""));
+        if(c.tipo_consulta) lin("  Tipo de consulta: " + c.tipo_consulta);
         if(c.ebbo) lin("  Ebbó " + c.ebbo + (c.ebbo_texto ? ": " + c.ebbo_texto : "") + (c.ebbo_para ? " · para " + fmtFecha(c.ebbo_para) : "") + (c.ebbo_aceptado ? " · " + c.ebbo_aceptado : ""));
         if(c.obra_a || c.obra_hace) lin("  Obra" + (c.obra_a ? " a " + c.obra_a : "") + (c.obra_hace ? ", la hace " + c.obra_hace : ""));
         if(c.refran_dicho) lin("  Refrán: " + c.refran_dicho);
         if(c.prohibiciones) lin("  Prohibido: " + c.prohibiciones);
         if(c.leyo) lin("  Leyó: " + c.leyo);
+        if(c.notas) lin("  Consejo confirmado: " + c.notas);
+        if(c.seguimiento) lin("  Seguimiento: " + c.seguimiento);
+        if(c.proxima_fecha) lin("  Próxima fecha: " + fmtFecha(c.proxima_fecha));
+        for(const x of Object.values(c.selecciones||{}).flat()) lin("  Aplica (" + (x.categoria||"") + "): " + (x.texto||""));
       }
       lin();
     }
