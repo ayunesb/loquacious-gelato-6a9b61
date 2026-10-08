@@ -597,5 +597,60 @@
         "texto": "Se conservan los versos de Eyin, Bara Àgbọnnìrègún, Ọ̀rúnmìlà y Ògún, el canto de Erelu del Océano y los testimonios A y B de Oníkàámògún y Òràmolè. El material yorùbá de varios pasajes presenta acentos y caracteres alterados en la extracción digital; se mantiene el texto fuente para cotejo y no se fabrica una versión corregida."
       }
     ]
+  },
+  "12": {
+    "titulo": "Odù 12 · Òtúrúpọ̀n Méjì",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Òtúrúpọ̀n Méjì reúne resistencia, prudencia y cuidado de la vida familiar. La ficha base destaca maternidad, parto, hijos y la fuerza para soportar dificultades. Dafá lo relaciona con el mantenimiento de la salud, pero sus explicaciones tradicionales sobre enfermedad no deben tomarse como hechos médicos. Los relatos enseñan a orientar la tenacidad y a escuchar consejo antes de actuar."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Los textos plantean preguntas distintas:",
+        "puntos": [
+          "La persona consulta por hijos, un embarazo o el bienestar de su familia; varios versos tratan el nacimiento y la crianza.",
+          "Tiene resistencia y voluntad, pero su firmeza puede convertirse en terquedad si desoye a mayores o personas con experiencia.",
+          "Se prepara para casarse o quiere saber qué futuro tendrá una unión. El relato de Ọlọ́fin y Pupayẹmi presenta una familia de dos hijos.",
+          "Enfrenta un cambio de vivienda y busca un hogar estable; Yaya y Yayá construyen casas con resultados diferentes.",
+          "Le preocupa una enfermedad o la vulnerabilidad de un niño. Los relatos hablan de protección ritual; la atención de salud real requiere valoración profesional.",
+          "Ha llegado a un lugar nuevo o quiere afirmar su posición. Los dos Ogẹ descienden a Ifẹ en un verso.",
+          "Necesita evitar que su audacia lo ponga en peligro, como el mortero Odo en otra historia."
+        ],
+        "cierre": "Estas situaciones pertenecen a versos diferentes y deben relacionarse con el motivo concreto de la consulta."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "Se anuncian estabilidad familiar, hijos, éxito de los dos Ogẹ en Ifẹ, una vivienda duradera para Yayá y larga vida en el relato de Ikusigbade. La perseverancia favorable se combina con prudencia y guía. Un verso destaca que dos hijos, aunque pocos, pueden llegar a ser importantes; evita medir la bendición solo por cantidad."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La manifestación difícil es la obstinación que ignora consejo, la audacia sin cuidado y la fragilidad de un proyecto mal preparado, como la casa de Yaya. Los relatos usan enfermedad y muerte temprana como motivos religiosos; no permiten diagnosticar infecciones, pronosticar un embarazo ni garantizar supervivencia. Si hay síntomas o preocupación por una gestación, corresponde atención médica."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Resistir no significa insistir a ciegas. La fortaleza de Òtúrúpọ̀n se aprovecha cuando escucha experiencias ajenas, evalúa riesgos y cuida lo que está construyendo. La pareja de casas de Yaya y Yayá deja una imagen clara: dos personas pueden perseguir la misma meta, pero la preparación determina si el resultado perdura."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Los dos Ogẹ reciben un consejo antes de descender a Ifẹ. Ọlọ́fin consulta por su matrimonio con Pupayẹmi y el futuro de sus dos hijos. Odo, el mortero, recibe una advertencia para que su valentía no se vuelva peligro. Otro Ogẹ rehúsa una indicación ligada a la prudencia. Dafá conserva la historia de Ikusigbade y la de Yaya y Yayá, que buscan construir una casa. Son situaciones independientes."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "Los versos de los dos Ogẹ, Ọlọ́fin, Odo y el Ogẹ que rehúsa el consejo contienen listas y propósitos diferentes. Dafá describe una ofrenda para Ikusigbade dirigida a Ìbejì y otra para el caso de la vivienda relacionada con Egúngún e Ìbejì. La ficha base menciona Egúngún, Òrìṣànlá, Orí e Ifá en contextos específicos de familia y orientación. No se convierten en un único ẹbọ del signo ni sustituyen cuidados médicos."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Egúngún aparece en el relato de la vivienda y como referencia a los ancestros; Ìbejì figura en ofrendas de Dafá. La ficha base menciona Òrìṣànlá, Orí e Ifá en relación con hijos y decisiones. Dafá asocia el signo con Onílẹ̀ y Nàná Bùrùkú. Mantendría visibles estas funciones distintas, sin presentar todas como destinatarias de la misma práctica."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "Se mencionan la fronda de palma del relato de Ikusigbade, aceite de palma, pimienta de caimán en el verso de Odo, piedras de rayo, caracoles y tortugas en el relato de los dos Ogẹ. La casa de Yaya y Yayá funciona como elemento narrativo de estabilidad. Las listas concretas deben permanecer junto a sus versos."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "El corpus contiene los versos de los dos Ogẹ, de Ọlọ́fin y Pupayẹmi, de Odo, del Ogẹ que desoye el consejo, y los relatos de Ikusigbade y Yaya/Yayá. Las líneas yorùbá y algunas traducciones del Word muestran errores de OCR; conviene mantener el original localizable antes de ofrecer una corrección o traducción nueva."
+      }
+    ]
   }
 }
