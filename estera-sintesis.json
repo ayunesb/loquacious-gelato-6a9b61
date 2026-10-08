@@ -2451,5 +2451,58 @@
         "texto": "Se conservan el verso de los sabios sobre la muerte y los cantos de Òpòló y Àràbà. Una fuente paralela titula «Oyeku-Isẹ» como Oráculo 71; la Estera usa Odù 45. Las grafías yorùbá y la glosa botánica del cuaderno requieren cotejo antes de una edición corregida."
       }
     ]
+  },
+  "46": {
+    "titulo": "Odù 46 · Ọ̀yẹ̀kú Òfún",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ọ̀yẹ̀kú Òfún reúne un obstáculo repentino con la posibilidad de atravesarlo y recuperar estabilidad. Dafá contrasta el daño de evitar un proceso de sanación con el alivio al concluirlo. Los versos hablan de una enfermedad súbita, del trabajo del destino y de la relación entre padres e hijos; son situaciones diferentes, no un pronóstico único."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "La consulta puede remitir a situaciones distintas:",
+        "puntos": [
+          "Ha surgido un obstáculo inesperado en la vida diaria o en un negocio.",
+          "La persona nota síntomas repentinos o teme enfermar; el relato de Abaralile-oṣiṣẹ-oṣabą trata esa preocupación.",
+          "Se siente sometida a circunstancias que no controla y busca tranquilidad sobre su rumbo.",
+          "Hay tensiones familiares por burlas, ostentación o falta de respeto entre hijos y padres.",
+          "Quiere saber si un esfuerzo presente puede traducirse en bienestar, recursos o descendencia."
+        ],
+        "cierre": "El verso de enfermedad no diagnostica a nadie: ante síntomas súbitos corresponde buscar atención médica."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "Dafá describe la superación de una enfermedad inesperada al completar un proceso de sanación. Abaralile-oṣiṣẹ-oṣabą se recupera en su relato; la versión paralela aclara que su enfermedad no fue grave. El verso del ser humano describe fuerza, mejoría de vida y paz mental; su canto enumera riqueza, pareja e hijos como bienes del destino. Son posibilidades narrativas, no garantías clínicas o materiales."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "Dafá advierte que evitar la sanación puede agravar una disfunción. La ficha base habla de una dificultad inesperada en el ambiente cotidiano o de negocios. El cuaderno previene contra las burlas y la actitud pomposa de hijos hacia sus padres. Otro verso alude a muerte y maldad en una imagen de peligro; se conserva como relato y no como anuncio literal de una muerte."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Atender a tiempo un problema y aceptar ayuda favorece la recuperación del equilibrio. El relato del enfermo trata la respuesta ante una dificultad súbita; el del ser humano sitúa la labor y los bienes en relación con Ìpín, el destino. El respeto familiar forma parte de esa estabilidad."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Abaralile-oṣiṣẹ-oṣabą, antes sano, recibe una advertencia sobre una enfermedad repentina; el relato concluye con su recuperación. Pékótókótó consulta para Èèyàn, el ser humano que sirve a Ìpín en el Cielo; después de ofrecer ñames, se canta la fuerza y los bienes que puede recibir. Un segundo pasaje del cuaderno se dirige a Baálé, cabeza de familia, y a sus hijos, y contrapone los movimientos del padre con la conducta de los descendientes."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "El relato de Abaralile-oṣiṣẹ-oṣabą nombra babosa, pescado, epo y cauríes junto con medicina de Ifá; la fuente paralela habla de manteca de corojo. El cuaderno prescribe dieciséis ñames y describe su uso ritual en el verso de Èèyàn. El pasaje de Baálé también pide sacrificio para longevidad, sin precisar aquí una lista completa. Cada indicación pertenece a su propio caso y ninguna reemplaza atención sanitaria."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Ifá orienta los tres relatos. Ìpín, el destino, es central en el verso de Èèyàn: su canto asocia el trabajo del destino con recursos, familia y otros bienes. Baálé y sus hijos son personajes humanos del pasaje familiar, no nombres de orichas; no se asigna al signo un oricha exclusivo sin testimonio explícito."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "El ñame es el alimento y elemento ritual explícito del cuaderno. En el relato de enfermedad aparecen babosa, pescado, epo y cauríes. No se identifica una planta medicinal concreta ni se infiere la composición de la “medicina de Ifá”, que el texto no detalla."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "El verso de Adurogangan y Ayẹgiridanu trata la enfermedad y recuperación de Abaralile-oṣiṣẹ-oṣabą. El canto “Ìyànňyàn” celebra el trabajo de Ìpín y enumera sus bienes; otro verso menciona a Baálé y sus hijos. La transcripción yorùbá presenta signos de OCR alterado y se conserva sin corregir ni retraducir por conjetura."
+      }
+    ]
   }
 }
