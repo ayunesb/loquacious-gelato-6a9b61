@@ -1,5 +1,5 @@
-const CACHE = "odu-de-ifa-v1";
-const SHELL = ["./", "index.html", "icon-192.png", "icon-512.png", "manifest.webmanifest"];
+const CACHE = "odu-de-ifa-v2";
+const SHELL = ["./", "index.html", "estera-sintesis.json", "icon-192.png", "icon-512.png", "manifest.webmanifest"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
