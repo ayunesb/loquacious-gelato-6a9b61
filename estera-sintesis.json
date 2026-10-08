@@ -982,5 +982,60 @@
         "texto": "Se conservan los dos versos de Ogbè Ìwòrì, el texto del cazador y el agricultor y el relato de Èbù Èyìn. El cuaderno incluye líneas yorùbá con caracteres alterados; una fuente paralela numera «Ogbe Wehin» como Oráculo 19, aunque la ficha actual es el Odù 18 de la secuencia de la Estera. Se mantiene la equivalencia por nombre y contenido, sin trasladar su número."
       }
     ]
+  },
+  "19": {
+    "titulo": "Odù 19 · Ogbè Ìdí",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ogbè Ìdí trata una apertura que necesita cuidado para no volverse tropiezo. La ficha habla de presión emocional, a menudo ligada a la intimidad o la pareja, que reduce la capacidad de actuar. Dafá contrapone un renacimiento productivo, logrado con trabajo y optimismo, a cambios sin rumbo. Los relatos añaden deuda, amistad, viaje y descendencia como contextos diferentes."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Según el pasaje pertinente, puede estar ocurriendo que:",
+        "puntos": [
+          "La persona siente presión afectiva o teme sentirla, y mientras no la atienda le cuesta realizar un proyecto.",
+          "Se prepara para una salida o una expedición y necesita evaluar un obstáculo antes de entrar en una situación difícil; Ogbè se mete por error en el cuerpo de un elefante durante una cacería.",
+          "Busca salir de una deuda. Èṣù pesca para reunir recursos, pero otros lo distraen con encargos en la historia.",
+          "Una amistad o familiar que está lejos puede regresar con buenas noticias. El relato de Baáyannì y Ṣàngó se centra en cuidar el vínculo.",
+          "Desea hijos; Àjàgbé llora por descendencia en un verso del cuaderno.",
+          "Trabaja para mejorar sus ingresos y ampliar su comunidad, posibilidad expresada en el iré de Dafá.",
+          "Percibe celos o interrupciones en su avance. El texto lo presenta como posibilidad de consulta, sin identificar culpables reales."
+        ],
+        "cierre": "Las escenas no son predicciones acumulables; cada una necesita el motivo de consulta y la versión correspondiente."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "Dafá anuncia la transformación de una etapa pobre en abundancia mediante trabajo y ánimo sostenidos, con nuevos vínculos de amistad. Baáyannì vuelve con fortuna y comparte con Ṣàngó; Àjàgbé obtiene descendencia en su relato. La historia de Èṣù gira en torno a pagar una deuda y recuperar margen de acción. El bien del signo se muestra en una salida ordenada de la presión, no en cambiar por cambiar."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La presión emocional sin atender puede cerrar posibilidades prácticas. El cazador Ogbè precipita su entrada en un hueco sin comprobar qué es; el episodio ilustra cómo un apuro se vuelve ridículo y peligroso. Dafá advierte sobre cambios sin dirección e interrupciones por celos. Esas advertencias no prueban que una persona específica esté saboteando al consultante."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Abrir camino exige observar antes de actuar y cumplir con cuidado lo decidido. El cazador no revisa el refugio que elige; Baáyannì, en cambio, vuelve con recursos y cuida la amistad. En la lectura de Dafá, la mejora nace de trabajo constante y optimismo, no de huir de un problema íntimo sin resolverlo."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Ogbè sale de caza, busca abrigo durante una lluvia y acaba atrapado en un elefante. Èṣù trabaja como pescador para pagar una deuda con varias entidades, mientras recibe encargos que complican su plan. Baáyannì viaja y vuelve con fortuna para compartir con Ṣàngó. Àjàgbé, identificado en el relato con la mosca, busca hijos y celebra su numerosa descendencia. Son historias separadas."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "La cacería de Ogbè tiene una lista de chivos, gallos y cauríes; el episodio de la deuda de Èṣù presenta otra con cascarones de palma, palomas y cauríes. Los textos de Baáyannì y Àjàgbé aconsejan sacrificio en sus casos propios sin que se transfiera la lista de los anteriores. Dafá ofrece aquí descripciones de iré e ibi, no un ẹbọ único de Ogbè Ìdí."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Èṣù protagoniza el relato de deuda con Ọ̀rúnmìlà, Òrìṣànlá, Òrìṣà Òkò y Ògún. Ṣàngó es el amigo con quien Baáyannì comparte su fortuna; Òrìṣànlá también aparece en el verso de Àjàgbé. Ifá guía las consultas. Cada entidad tiene un papel concreto dentro de su relato."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "Aparecen el bosque de la cacería, la lluvia, el elefante, peces de la pesca de Èṣù y cascarones de nuez de palma. El relato de Baáyannì incluye cauríes y una prenda donde se atan. Ninguna mención permite fijar una planta principal del signo; cada elemento se conserva en su contexto."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "El corpus incluye los versos de Ogbè y el elefante, de Èṣù y la deuda, de Baáyannì y de Àjàgbé. La fuente paralela rotula «Ogbe Di» como Oráculo 21, mientras la Estera usa el número 19 para este signo; la equivalencia se tomó del nombre y del contenido, no de la cifra. El yorùbá del cuaderno presenta OCR irregular y requiere cotejo antes de una transcripción nueva."
+      }
+    ]
   }
 }
