@@ -2612,5 +2612,58 @@
         "texto": "La ficha reúne dos versos sobre peligro y salud infantil, el canto del pato y el canto de reconciliación de Alágbàáà. Bascom aporta los relatos de Olukoun y de la pareja perseguida. Las líneas yorùbá con OCR dañado o nombres dudosos se conservan sin traducir ni corregir por conjetura."
       }
     ]
+  },
+  "49": {
+    "titulo": "Odù 49 · Ìwòrì Ìdí",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ìwòrì Ìdí relaciona la continuidad de la vida con generaciones, cuidado del hogar y capacidad de transformarse. Un verso atribuye a Ifá la idea de que los descendientes pueden dar nueva vida simbólica a sus antepasados; el cuaderno habla de hijos, alimento y generosidad. Dafá contrapone renacimiento y abundancia sobria con pérdida causada por el miedo a perder."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Las fuentes ofrecen situaciones posibles, no una sola historia personal:",
+        "puntos": [
+          "La persona desea hijos o reflexiona sobre la continuidad de su familia y sus ancestros.",
+          "El hogar necesita alimento y estabilidad antes de asumir nuevas responsabilidades afectivas o sexuales.",
+          "Teme perder sus bienes y esa preocupación está empujándola a decisiones que los disipan.",
+          "Tiene una prenda valiosa que podría compartir con personas necesitadas; el cuaderno lo cuenta mediante el búho y su ropa vistosa.",
+          "Busca un cambio de vida que permita pasar de la escasez a una abundancia sostenida."
+        ],
+        "cierre": "El deseo de hijos no debe presentarse como obligación, ni el relato como promesa de embarazo."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "Dafá asocia la transformación con renacimiento y una abundancia nacida de la sobriedad. El verso de Ọ̀rúnmìlà describe parejas de seres ofrecidas como imagen de multiplicación de la tierra. El cuaderno anuncia bienestar del hogar y bendición de hijos, a la vez que insiste en tener comida suficiente. Es una lectura de cuidado y continuidad, no de garantía biológica."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "Dafá describe la pérdida que puede provocar el miedo a perder. En el cuaderno, el hambre debilita la vida doméstica y sexual; el búho ignora un consejo de compartir su ropa colorida y lamenta el resultado en su canto. La amenaza a la vista pertenece a esa fábula: cualquier pérdida visual real requiere evaluación médica, no una explicación ritual automática."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "La continuidad no se reduce a tener descendencia. Alimentar, compartir, cuidar vínculos y transmitir vida y memoria también sostienen a una familia. La noción de reencarnación es una idea religiosa expresada por el verso; se conserva como tal, sin convertirla en hecho demostrable o en exigencia para quien consulta."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Ọ̀rúnmìlà expresa que descenderá del cielo a la tierra y llevará la tierra de vuelta al cielo; el verso relaciona la reciprocidad de padres e hijos con la multiplicación de la vida. Ìwòrì consulta antes de mirar Ìdí y oye que necesita el estómago lleno. En otra fábula, Òwiwí, el búho, desoye a Òhúù y no comparte la prenda vistosa indicada; su grito recuerda la advertencia."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "El verso de Ọ̀rúnmìlà menciona animales presentados en pares, macho y hembra: carnero y oveja, chivo y cabra, gallo y gallina, entre otros. El cuento del búho se centra en entregar una ropa grande y de colores a personas pobres; el pasaje de Ìwòrì e Ìdí alude a sacrificio y alimento sin una lista completa aquí. Las indicaciones pertenecen a relatos distintos y no se combinan en una receta general."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Ọ̀rúnmìlà es protagonista del verso sobre cielos, tierra y generaciones. Ifá orienta los relatos del cuaderno. Los padres y madres son figuras de continuidad familiar; Òwiwí y Òhúù son personajes de una fábula de aves, no orichas."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "La comida y el estómago lleno son elementos explícitos del relato de Ìwòrì e Ìdí. El vestido grande y multicolor del búho representa un bien que podría compartirse. El verso de la multiplicación enumera animales por parejas, pero no identifica una planta particular del signo."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "Se conservan el verso de Ọ̀rúnmìlà sobre padres, madres y descendientes, el canto de Ìwòrì e Ìdí sobre alimento, y el lamento de Òwiwí. La transcripción yorùbá muestra grafías inestables; las lecturas dudosas no se normalizan ni se retraducen por conjetura."
+      }
+    ]
   }
 }
