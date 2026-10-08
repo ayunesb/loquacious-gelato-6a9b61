@@ -665,6 +665,7 @@ function marksSVG(der, izq, h){
 /* ---------- Estado ---------- */
 let odus = [], libros = [];
 let textos = {};              // textos del Odù abierto: {libroId: datos}
+let oduCanticos = [];         // rezos y cantos vinculados directamente al Odù abierto
 let localTextos = {};         // modo sin base de datos: {"odu-001__libro": datos}
 let db = null, canWrite = false, localOnly = false;
 let current = null, unsubTextos = null;
@@ -678,8 +679,9 @@ function setBook(id){
   loadTextIds(); renderDetail();
 }
 function activeBook(){
+  if(currentBook === "todos") return "todos";
   if(libros.some(b => b.id === currentBook)) return currentBook;
-  return libros[0]?.id || null;
+  return "todos";
 }
 
 /* ---------- Lista ---------- */
@@ -697,6 +699,41 @@ function lptLimpio(t){
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+const LPT_CAMPOS = [
+  ["refran", /^El refr[aá]n dice\s*:\s*(.*)$/i, "Refrán"],
+  ["orichas", /^Los Orishas que te aconsejan son\s*:\s*(.*)$/i, "Orichas que aconsejan"],
+  ["entorno", /^Entorno actual\s*:\s*(.*)$/i, "Entorno actual"],
+  ["positivo", /^Aspectos positivos\s*:\s*(.*)$/i, "Aspectos positivos"],
+  ["negativo", /^Aspectos negativos\s*:\s*(.*)$/i, "Aspectos negativos"],
+  ["general", /^Generalidades\s*:\s*(.*)$/i, "Generalidades"],
+  ["recomendaciones", /^Recomendaciones\s*:\s*(.*)$/i, "Recomendaciones"],
+  ["enfermedades", /^Enfermedades relacionadas con el (?:Od[uù]|Oddu)\s*:\s*(.*)$/i, "Enfermedades relacionadas"],
+  ["prohibiciones", /^Prohibiciones\s*:\s*(.*)$/i, "Prohibiciones"],
+  ["nacimientos", /^Nacimientos que se dan en el (?:Od[uù]|Oddu).*?:\s*(.*)$/i, "Nacimientos"],
+  ["sacrificios", /^Sacrificio de nacimiento y base del (?:od[uù]|oddu)[.:]?\s*(.*)$/i, "Sacrificios"],
+  ["sacrificio-nacimiento", /^Sacrificio de nacimiento del (?:od[uù]|oddu)\s*:\s*(.*)$/i, "Sacrificio de nacimiento"],
+  ["sacrificio-base", /^Sacrificio base del (?:od[uù]|oddu)\s*:\s*(.*)$/i, "Sacrificio base"]
+];
+function lptSecciones(t){
+  const partes = [], lineas = String(t || "").split("\n");
+  let actual = {id:"introduccion", titulo:"Introducción", lineas:[]};
+  for(const linea of lineas){
+    const campo = LPT_CAMPOS.find(([, patron]) => patron.test(linea.trim()));
+    if(campo){
+      if(actual.lineas.some(x => x.trim())) partes.push(actual);
+      const resto = linea.trim().match(campo[1])?.[1] || "";
+      actual = {id:campo[0], titulo:campo[2], lineas:resto ? [resto] : []};
+    } else actual.lineas.push(linea);
+  }
+  if(actual.lineas.some(x => x.trim())) partes.push(actual);
+  return partes;
+}
+function lptContenidoHTML(t){
+  const partes = lptSecciones(t);
+  if(partes.length < 2) return `<div class="box"><p class="prose" style="white-space:pre-line;margin:0">${esc(t)}</p></div>`;
+  return `<nav class="jump" aria-label="Secciones">${partes.map((p,i) => `<a href="#lpt-${p.id}-${i}">${esc(p.titulo)}</a>`).join("")}</nav>
+    ${partes.map((p,i) => `<section class="block" id="lpt-${p.id}-${i}"><h2>${esc(p.titulo)}</h2><p class="prose" style="white-space:pre-line">${esc(p.lineas.join("\n").trim())}</p></section>`).join("")}`;
 }
 function lptNombre(e){
   let s = (e.titulo || "").replace(/\([^)]*\)/g, " ").replace(/†/g, " ").replace(/\s+/g, " ").trim();
@@ -729,7 +766,7 @@ function renderLukumi(titulo){
   if(lptAbierta){
     const f = lptIndex.find(x => x.id === lptAbierta);
     $("#main").innerHTML = `<div class="page">${phead(lptNombre(f || {}))}
-      <div class="box"><p class="prose" style="white-space:pre-line;margin:0">${lptTexto ? esc(lptTexto) : "Cargando…"}</p></div>
+      ${lptTexto ? lptContenidoHTML(lptTexto) : `<div class="box">Cargando…</div>`}
       <button class="btn" id="lptVolver" style="margin-top:14px">Volver</button>
     </div>`;
     $("#lptVolver").onclick = () => { lptAbierta = null; lptTexto = ""; renderDetail(); };
@@ -790,7 +827,7 @@ function renderTabs(){
   const langBtn = `<button class="langbtn" id="langSwitch" aria-label="${tr("login.idioma")}" title="${tr("login.idioma")}">${LANG.toUpperCase()}</button>`;
   $("#topbar").innerHTML = brand + nav + langBtn;
   $("#topbar").querySelectorAll("[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
-  const chips = view === "biblioteca" ? libros.map(b => `<button type="button" data-book="${esc(b.id)}" aria-selected="${b.id===act}">${esc(b.titulo)}</button>`).join("") : "";
+  const chips = view === "biblioteca" ? `<button type="button" data-book="todos" aria-selected="${act==="todos"}">Contenido reunido de Ifá</button>` + libros.map(b => `<button type="button" data-book="${esc(b.id)}" aria-selected="${b.id===act}">${esc(b.titulo)}</button>`).join("") : "";
   const host = $("#bookChips");
   if(host) host.innerHTML = chips;
   document.querySelectorAll("[data-book]").forEach(b => b.onclick = () => setBook(b.dataset.book));
@@ -828,6 +865,7 @@ function renderMasSheet(resto){
 
 function contentHTML(o){
   const act = activeBook();
+  if(act === "todos") return contenidoUnificadoHTML();
   if(!act) return `<div class="nobook"><p>Todavía no hay libros. ${canWrite?"Usa “Agregar libro” para crear la primera pestaña.":""}</p></div>`;
   const b = libros.find(x => x.id === act);
   const t = textos[act];
@@ -843,6 +881,7 @@ function contentHTML(o){
   if(t.caracteristicas) secs.push(["gen","Características generales"]);
   if(t.consejo) secs.push(["con","Consejo"]);
   if(t.versos?.length) secs.push(["ver","Versos"]);
+  if(oduCanticos.length) secs.push(["rezos","Rezos y cánticos"]);
   return `
     ${secs.length>1?`<nav class="jump" aria-label="Secciones">${secs.map(([k,s])=>`<a href="#s-${k}" data-jump="${k}">${s}</a>`).join("")}</nav>`:""}
     ${t.caracterizacion?`<section class="block" id="s-car"><h2>Caracterización</h2><p class="prose">${esc(t.caracterizacion)}</p></section>`:""}
@@ -864,6 +903,41 @@ function contentHTML(o){
         ${v.comentario?`<div class="com"><p class="lbl">Comentario</p><p class="prose">${esc(v.comentario)}</p></div>`:""}
       </article>`).join("")}</div>`:""}
     ${b.cita?`<footer class="cite"><p class="lbl">Fuente</p><p>${esc(b.cita)}</p></footer>`:""}`;
+}
+function contenidoUnificadoHTML(){
+  const fichas = Object.values(textos).filter(hasText);
+  if(!fichas.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
+  const campos = [["caracterizacion","Caracterización"],["wo","Wo"],["caracteristicas","Características generales"],["consejo","Consejo"]];
+  const bloques = campos.map(([clave,titulo]) => {
+    const valores = [...new Set(fichas.map(t => (t[clave] || "").trim()).filter(Boolean))];
+    return valores.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
+  }).join("");
+  const vistos = new Set(), versos = [];
+  for(const ficha of fichas) for(const v of (ficha.versos || [])){
+    const clave = JSON.stringify(v);
+    if(!vistos.has(clave)){ vistos.add(clave); versos.push(v); }
+  }
+  const datos = [["ebbo","Ebós"],["hierbas","Plantas y hierbas"],["orichas","Orichas relacionados"],["canticos","Cánticos"],["medicina","Medicina de Ifá"]];
+  const temas = datos.map(([clave,titulo]) => {
+    const entradas = versos.map((v,i) => ({ref:v.ref || `Verso ${i+1}`, texto:(v[clave] || "").trim()})).filter(x => x.texto);
+    return entradas.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${entradas.map(x => `<div class="box"><p class="lbl">${esc(x.ref)}</p><p class="prose">${esc(x.texto)}</p></div>`).join("")}</section>` : "";
+  }).join("");
+  const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<p class="prose yo">${esc(v.yoruba)}</p>`:""}${v.traduccion?`<p class="prose">${esc(v.traduccion)}</p>`:""}${v.comentario?`<p class="prose">${esc(v.comentario)}</p>`:""}</article>`).join("")}</section>` : "";
+  const contenido = bloques + temas + versoHTML;
+  const enlaces = [...contenido.matchAll(/<section class="block" id="s-([^"]+)"><h2>([^<]+)<\/h2>/g)]
+    .map(([,id,titulo]) => `<a href="#s-${id}">${titulo}</a>`);
+  if(oduCanticos.length) enlaces.push(`<a href="#s-rezos">Rezos y cánticos</a>`);
+  return (enlaces.length ? `<nav class="jump" aria-label="Secciones">${enlaces.join("")}</nav>` : "") + contenido;
+}
+function oduCanticosHTML(){
+  if(!oduCanticos.length) return "";
+  return `<section class="block" id="s-rezos"><h2>Rezos y cánticos</h2>
+    ${oduCanticos.map((c,i) => `<article class="verse" id="rezo-${i}">
+      <h3>${esc(c.titulo || c.tipo || "Rezo")}</h3>
+      ${c.texto_original?`<p class="prose yo">${esc(c.texto_original)}</p>`:""}
+      ${c.traduccion?`<div><p class="lbl">Traducción</p><p class="prose">${esc(c.traduccion)}</p></div>`:""}
+      ${c.notas?`<div><p class="lbl">Notas</p><p class="prose">${esc(c.notas)}</p></div>`:""}
+    </article>`).join("")}</section>`;
 }
 
 const legalLinks = () => [["aviso-privacidad",tr("footer.aviso")],["privacidad",tr("footer.politica")],["terminos",tr("footer.terminos")],["cookies",tr("footer.cookies")],["descargo",tr("footer.descargo")],["menores",tr("footer.menores")],["contenido",tr("footer.contenido")]];
@@ -929,6 +1003,7 @@ function renderDetailInner(){
       </div>
     </header>
     ${contentHTML(o)}
+    ${oduCanticosHTML()}
     ${libretaHTML(o)}
     ${user?`<section class="mynote"><p class="lbl">Mis notas sobre ${esc(o.nombre)} (privadas)</p><textarea id="myNote" placeholder="Escribe aquí tus notas personales">${esc(notaOdu[o.id] ?? "")}</textarea><div style="display:flex;gap:10px;align-items:center;margin-top:8px"><button class="btn" id="btnNote">Guardar nota</button><span class="muted" id="noteMsg"></span></div></section>`:""}`;
   bindOduUserTools(o); bindLibreta(o);
@@ -1298,6 +1373,7 @@ async function removeLibro(id){ must(await sb.from("libros").delete().eq("id", i
 let reqTextos = 0;
 function loadTextos(id){
   textos = {};
+  oduCanticos = [];
   if(!id) return;
   const n = ++reqTextos;
   sb.from("textos").select("*").eq("odu_id", id).then(r => {
@@ -1305,6 +1381,12 @@ function loadTextos(id){
     textos = {}; for(const row of r.data) textos[row.libro] = textoFromRow(row);
     if(!$("#dlg").open) renderDetail();
   });
+  sb.from("canticos_rezos").select("id,tipo,titulo,texto_original,traduccion,notas")
+    .eq("odu_id", id).order("titulo").limit(200).then(r => {
+      if(n !== reqTextos || current !== id || r.error) return;
+      oduCanticos = r.data || [];
+      if(!$("#dlg").open) renderDetail();
+    });
 }
 async function loadAll(){
   try{
@@ -2990,7 +3072,9 @@ function renderEstera(){
 let filtroMeji = false, filtroTexto = false, textIds = new Set();
 async function loadTextIds(){
   const b = activeBook(); if(!b){ textIds = new Set(); return; }
-  const r = await sb.from("textos").select("odu_id").eq("libro", b).limit(1000);
+  let q = sb.from("textos").select("odu_id").limit(1000);
+  if(b !== "todos") q = q.eq("libro", b);
+  const r = await q;
   textIds = new Set((r.data || []).map(x => x.odu_id));
   renderList();
 }
