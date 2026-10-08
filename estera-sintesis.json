@@ -487,5 +487,60 @@
         "texto": "El corpus incluye versos sobre el machete y el trabajo de Ògún, su misión hacia el mundo, el tigre, la fortuna de Idena-Magbon y los hijos de Ọ̀rúnmìlà. Varias grafías yorùbá están deterioradas en la transcripción del Word; el pasaje español del verso 9.3 se cotejó con el PDF, pero el texto yorùbá requiere revisión antes de ofrecer una lectura o traducción corregida."
       }
     ]
+  },
+  "10": {
+    "titulo": "Odù 10 · Òsá Méjì",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Òsá Méjì trata el cambio brusco de circunstancias y la manera de responder a él. Dafá lo resume como «cambio radical» que puede desordenar la vida o abrir una oportunidad. Los testimonios A y B del signo apuntan a bienes diferentes: uno habla de prevalecer frente a oposición y otro de alcanzar riqueza. La ficha reúne ambos sin convertirlos en un único anuncio."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Las posibilidades se leen según la consulta y el relato que se active:",
+        "puntos": [
+          "La persona rechaza un cambio repentino en el trabajo o en una relación porque teme perder estabilidad.",
+          "Necesita afrontar oposición o una disputa. El testimonio A de Òsá Méjì aconseja una práctica ligada a Ṣàngó para prevalecer.",
+          "Busca prosperidad material. El testimonio B anuncia riqueza mediante la historia de Òwú y Ògòdò, separada de la situación del testimonio A.",
+          "Se aproxima un viaje o trabajo con personas desconocidas. Un relato de Ọ̀rúnmìlà describe cómo cambia la intención de quienes iban a perjudicarlo.",
+          "Teme que un susto, conflicto o circunstancia imprevista detenga un proyecto, como les ocurre a los dos Òsá en un verso.",
+          "Busca pareja, hijos, reconocimiento o una mejora que todavía no llega; cada uno de esos temas aparece en un verso distinto.",
+          "Experimenta cansancio o una preocupación por la salud. La historia de Ajá es un relato sobre una necesidad desatendida, no un diagnóstico para quien consulta."
+        ],
+        "cierre": "No corresponde afirmar que todos estos hechos ocurren a la vez ni que la oposición descrita pruebe la existencia de enemigos concretos."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "El testimonio B anuncia riqueza para Òwú. Otros pasajes hablan de viajes seguros, alivio de la oposición, pareja, descendencia, reconocimiento y conservación de lo logrado. Dafá plantea que un cambio externo puede aprovecharse para generar abundancia. En el testimonio A, la posibilidad favorable es prevalecer; en el B, obtener prosperidad. Ambas versiones quedan visibles por separado."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La cara difícil del signo es huir de responsabilidades, quedar paralizado ante un cambio o actuar desde el miedo. Los dos Òsá de un verso abandonan su proyecto cuando surge una lucha. El relato de Ajá presenta el costo de desatender una necesidad. Los pasajes sobre adversarios y pesadillas son advertencias tradicionales; no se convierten en afirmaciones médicas ni en acusaciones sobre personas reales."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Un cambio inesperado no determina por sí solo el resultado. Los relatos contrastan huir, prepararse y responder con firmeza. El viaje de Ọ̀rúnmìlà muestra una oposición que puede transformarse; el testimonio de Òwú presenta una ganancia después del consejo recibido. La enseñanza es reconocer qué ha cambiado y elegir una respuesta proporcionada."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Òsá Méjì A presenta a Òlúkòso y una victoria ligada a Ṣàngó. Òsá Méjì B relata la buena fortuna de Òwú, hijo de Ògòdò. Los dos Òsá viajan a Ifẹ y huyen de un conflicto inesperado. Otro verso describe a un Òsá que busca pareja; otro, el matrimonio de Ọ̀rúnmìlà con Olúyemi. Ajá desoye un consejo relacionado con su sed. Dafá conserva un viaje de Ọ̀rúnmìlà y un relato de Ejipabileseigi sobre reconocimiento. Son episodios distintos."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "El testimonio A manda una ofrenda para prevalecer y menciona a Ṣàngó, sin lista de ingredientes en la página cotejada. El B dice que Òwú realizó sacrificio, también sin lista precisa. Los versos de los dos Òsá, la búsqueda de pareja y el matrimonio de Ọ̀rúnmìlà sí presentan ofrendas diferentes. Dafá da una lista particular para el viaje de Ọ̀rúnmìlà. No se completan las listas ausentes ni se fusionan en un ẹbọ único del signo."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Ṣàngó figura en el testimonio A como entidad vinculada con prevalecer. Dafá asocia el signo con Ọya y menciona a Ìyámi en una ofrenda del relato de viaje. Ọ̀rúnmìlà protagoniza ese viaje y otro verso sobre matrimonio. Estas apariciones tienen funciones diferentes y no deben presentarse como una misma instrucción para toda consulta."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "En las historias aparecen Òwú, relacionado con el cultivo y la ganancia del granjero, así como maíz, aceite de palma y bebidas en el relato de viaje. Un verso menciona la piedra de rayo; otros, palomas y caracoles de babosa. Se mantiene Òwú por su nombre en el testimonio, sin fijar una identificación botánica a partir del OCR. Los elementos pertenecen a episodios separados."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "Se conservan los testimonios A y B de Òsá Méjì, los versos de los dos Òsá, la búsqueda de pareja, el matrimonio de Ọ̀rúnmìlà, Ajá y los cantos de los relatos de Dafá. El texto yorùbá del cuaderno tiene signos y acentos dañados; se presenta tal como pueda cotejarse con el PDF y no se reconstruye ni traduce de nuevo por conjetura."
+      }
+    ]
   }
 }
