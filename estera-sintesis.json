@@ -2344,5 +2344,58 @@
         "texto": "Los pasajes localizados son el verso de Ṣoràngun y el de Oni-alakan-esuru; no se atribuye un canto adicional a este signo sin texto comprobable. Una fuente paralela lo titula «Oyeku Batuye» y lo numera Oráculo 67, mientras la Estera usa Odù 43. Las grafías yorùbá del Word requieren revisión antes de una edición corregida."
       }
     ]
+  },
+  "44": {
+    "titulo": "Odù 44 · Ọ̀yẹ̀kú Ìrẹtẹ̀",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ọ̀yẹ̀kú Ìrẹtẹ̀ reúne determinación y cuidado de una persona enferma. Dafá contrapone la firmeza útil para proteger a la familia con la terquedad que retrasa la atención. El relato localizado se centra en Kuṣeru y un joven con hinchazón; la ficha no contiene base suficiente para convertirlo en una predicción de enfermedad para otra persona."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "El material revisado permite una lectura acotada:",
+        "puntos": [
+          "Alguien en la casa tiene un problema de salud y la familia busca apoyo.",
+          "Una persona insiste en seguir como antes aunque aparecen señales que requieren atención.",
+          "La familia necesita organizar cuidados y evitar que la preocupación se convierta en parálisis.",
+          "Un joven pasa por una enfermedad en el relato de Kuṣeru; su descripción no identifica una condición clínica concreta.",
+          "La determinación puede ayudar a sostener el cuidado si se acompaña de decisiones oportunas."
+        ],
+        "cierre": "El Odù no diagnostica hinchazón, no predice que alguien enfermará y no sustituye una consulta médica."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "Dafá habla de proteger la salud de una persona y su familia mediante atención sostenida. En la historia de Kuṣeru, los adivinos anuncian recuperación para el joven del relato. Se conserva como esperanza narrativa, sin prometer curación a quien consulte la Estera."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La terquedad puede retrasar ayuda necesaria y agravar una situación real. La ficha original dice que el consultante o alguien de su casa estará enfermo; aquí se trata como motivo tradicional, no como pronóstico. Hinchazón de manos, piernas, ojos o nariz requiere evaluación clínica, y una preparación ritual del relato no reemplaza esa atención."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Cuidar implica responder a los hechos. El signo presenta la determinación como apoyo para acompañar a una persona enferma, mientras advierte contra aferrarse a una sola explicación o tratamiento. La historia de Kuṣeru invita a reunir ayuda y no dejar solo al joven."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Los adivinos de la familia de Kuṣeru consultan por un joven antes delgado que presenta hinchazón en varias partes del cuerpo. Le dan a la familia un consejo y anuncian su recuperación dentro de ese relato. No se halló en los pasajes cotejados otro relato independiente que deba añadirse a esta ficha."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "La historia de Kuṣeru menciona palomas, cauríes y una preparación tradicional con materiales vegetales. Se conserva como dato del corpus; no se dan aquí pasos de preparación ni se recomienda ingerirla o aplicarla como tratamiento médico. No hay otra lista verificada para formar un ẹbọ general del signo."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Ifá guía la consulta de Kuṣeru y los adivinos de la familia intervienen como consejeros. Dafá enuncia la protección de la salud familiar sin fijar aquí una entidad destinataria universal. No se añaden orichas a partir de una inferencia."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "Una fuente nombra ayẹ y asunrun en la preparación del relato. Sus glosas botánicas proceden de una sola transcripción y deben cotejarse antes de asignarles una especie definitiva. También se mencionan sal y pimientos; su presencia en el texto no implica seguridad o eficacia clínica."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "El corpus revisado contiene el verso de los adivinos de Kuṣeru; no se inventa un canto adicional. Una fuente paralela lo titula «Oyeku-Irete» como Oráculo 69, mientras la Estera lo presenta como Odù 44. La lectura yorùbá y los nombres de plantas quedan pendientes de cotejo detallado."
+      }
+    ]
   }
 }
