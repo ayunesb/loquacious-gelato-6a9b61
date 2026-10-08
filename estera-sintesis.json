@@ -1037,5 +1037,59 @@
         "texto": "El corpus incluye los versos de Ogbè y el elefante, de Èṣù y la deuda, de Baáyannì y de Àjàgbé. La fuente paralela rotula «Ogbe Di» como Oráculo 21, mientras la Estera usa el número 19 para este signo; la equivalencia se tomó del nombre y del contenido, no de la cifra. El yorùbá del cuaderno presenta OCR irregular y requiere cotejo antes de una transcripción nueva."
       }
     ]
+  },
+  "20": {
+    "titulo": "Odù 20 · Ogbè Ìrosùn",
+    "secciones": [
+      {
+        "titulo": "Idea central",
+        "texto": "Ogbè Ìrosùn habla de recuperar equilibrio y llevar a buen término un camino que se abre. Dafá relaciona el iré con apoyo ancestral y progreso lento y constante; el ibi surge cuando la persona rechaza ese sostén y se vuelve inestable. Los relatos concretos tratan de protección, fortuna que llega de lejos y deseo de descendencia."
+      },
+      {
+        "titulo": "WO · Qué puede estar ocurriendo",
+        "introduccion": "Los textos plantean situaciones posibles, que deben separarse:",
+        "puntos": [
+          "La persona siente que enfrenta varios problemas a la vez y busca recuperar orden y calma.",
+          "Teme una pérdida, una enfermedad o un conflicto judicial; el verso de Àbàtí usa esos peligros como lenguaje religioso de protección.",
+          "Una oportunidad económica viene de fuera o requiere viajar para traer recursos al hogar; Òdùkèkèèkè va al bosque por fortuna.",
+          "Existe una pregunta por hijos o por una gestación deseada; el cuaderno conserva un verso de Òsìn Gàgààgà sobre descendencia.",
+          "Necesita sostener un avance gradual en vez de exigir un resultado inmediato.",
+          "Busca apoyo en antepasados y en prácticas de su tradición para dar continuidad a su proyecto."
+        ],
+        "cierre": "Ninguno de estos relatos permite afirmar que una enfermedad o un pleito ocurrirá necesariamente."
+      },
+      {
+        "titulo": "Iré",
+        "texto": "La lectura favorable de Dafá es avanzar con apoyo ancestral y constancia. Àbàtí recibe en un verso una promesa religiosa de protección; Òdùkèkèèkè vuelve con bienes a su casa; Òsìn Gàgààgà celebra hijos. La fortuna puede venir de lejos, pero los relatos insisten en prepararse para recibirla y conservarla."
+      },
+      {
+        "titulo": "Ibi y advertencias",
+        "texto": "La manifestación difícil es la inestabilidad que surge al apartarse de apoyos valiosos o abandonar un proceso antes de tiempo. El nombre Àbàtí se glosa como incumplimiento o tarea inconclusa y permite leer el relato como advertencia contra el descuido. Las menciones de muerte, enfermedad y pleitos son motivos narrativos; no constituyen pronóstico médico o legal."
+      },
+      {
+        "titulo": "Enseñanza principal",
+        "texto": "Un camino abierto se aprovecha paso a paso. El apoyo de generaciones anteriores y la conducta coherente pueden sostener lo que una oportunidad inicia. Òdùkèkèèkè no solo encuentra bienes: la historia se ocupa de que pueda llevarlos a casa sin perderlos."
+      },
+      {
+        "titulo": "Relatos reunidos",
+        "texto": "Àbàtí, hijo de Aramfè, consulta ante varios males y recibe una indicación de protección. Òdùkèkèèkè entra al bosque, recoge fortuna y regresa con ella. Òsìn Gàgààgà aparece en un canto sobre tener hijos. El cuaderno continúa después con Ogbè Ọ̀wọ́nrín, que pertenece al signo siguiente y no se incorpora aquí."
+      },
+      {
+        "titulo": "Ẹbọ y prácticas tradicionales",
+        "texto": "El verso de Àbàtí menciona carnero y hojas o medicina de Ifá. El cuaderno relaciona el caso de Òdùkèkèèkè con un sacrificio propio y, en otro comentario, nombra babosas y huevos para una consulta sobre descendencia. El relato de Òsìn Gàgààgà también aconseja una ofrenda sin detallar aquí una lista completa. Se conservan esas diferencias y no se compone un ẹbọ universal."
+      },
+      {
+        "titulo": "Relaciones espirituales",
+        "texto": "Dafá habla del sostén ancestral como eje del signo. Ifá guía las consultas de Àbàtí, Òdùkèkèèkè y Òsìn Gàgààgà; Odù se menciona en una indicación del cuaderno relacionada con descendencia. Ninguna referencia debe mezclarse con el signo posterior incluido en la misma página."
+      },
+      {
+        "titulo": "Plantas, alimentos y elementos",
+        "texto": "El bosque es el lugar de la búsqueda de Òdùkèkèèkè. La ofrenda de Àbàtí nombra hojas o medicina de Ifá sin identificar una especie. El cuaderno menciona huevos y babosas en una situación de descendencia. No se fija una planta del signo a partir de una referencia vegetal genérica."
+      },
+      {
+        "titulo": "Rezos, versos y cantos",
+        "texto": "Se conservan el verso de Àbàtí, el canto de Òdùkèkèèkè sobre traer fortuna al hogar y el de Òsìn Gàgààgà sobre hijos. Una fuente paralela titula «Ogbe’Rosu» como Oráculo 23, pero esta ficha es el Odù 20 de la Estera; la correspondencia se estableció por nombre y relato, no por el número. Las líneas yorùbá del cuaderno requieren cotejo de acentos y caracteres."
+      }
+    ]
   }
 }
