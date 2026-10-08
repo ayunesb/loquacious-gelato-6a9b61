@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Legal · Odù de Ifá</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECEFE4; --paper:#F7F8F2; --ink:#1C2B22; --muted:#66725F;
+  --green:#2F6B3F; --green-soft:#DCE6D5; --gold:#C9971C; --gold-soft:#F3E7C2; --rule:#C8CFBD;
+  --serif:"Alegreya", Georgia, "Times New Roman", serif;
+  --sans:"Alegreya Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#131C16; --paper:#1A251E; --ink:#E4E9DC; --muted:#9AA690; --green:#7DBB8A; --green-soft:#23372A; --gold:#E2B84A; --gold-soft:#3A3219; --rule:#2E3D32; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6}
+a{color:var(--green)}
+header.top{display:flex;align-items:center;gap:14px;padding:16px clamp(16px,4vw,40px);border-bottom:1px solid var(--rule);background:var(--paper);position:sticky;top:0;flex-wrap:wrap}
+header.top .brand{font-family:var(--serif);font-weight:700;font-size:1.2rem;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:8px}
+header.top nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+header.top nav a{font-size:.85rem;text-decoration:none;color:var(--muted);border:1px solid var(--rule);border-radius:99px;padding:5px 12px;white-space:nowrap}
+header.top nav a.on{background:var(--green);border-color:var(--green);color:var(--paper)}
+main{max-width:760px;margin:0 auto;padding:32px clamp(16px,4vw,40px) 80px}
+.idx{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.idx a{display:block;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);font-family:var(--serif);font-size:1.1rem;font-weight:500}
+.idx a:hover{border-color:var(--green)}
+.doc h1{font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 18px}
+.doc h2{font-family:var(--serif);color:var(--green);font-size:1.35rem;margin:30px 0 10px}
+.doc h3{font-family:var(--serif);font-size:1.1rem;margin:20px 0 8px}
+.doc p{margin:0 0 14px}
+.doc ul,.doc ol{margin:0 0 14px;padding-left:22px}
+.doc li{margin:0 0 6px}
+.doc strong{color:var(--ink)}
+.doc hr{border:0;border-top:1px solid var(--rule);margin:22px 0}
+.doc table{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:.92rem}
+.doc th,.doc td{border:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+.doc th{background:var(--green-soft)}
+.doc em{color:var(--muted)}
+.doc code{background:var(--gold-soft);border-radius:4px;padding:1px 5px;font-size:.9em}
+.muted{color:var(--muted)}
+.loading{color:var(--muted);padding:40px 0;text-align:center}
+footer.bottom{max-width:760px;margin:0 auto;padding:0 clamp(16px,4vw,40px) 60px;color:var(--muted);font-size:.88rem}
+footer.bottom a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/"><svg width="22" height="22" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6" width="2.4" height="5" rx="1.2" fill="currentColor"/><rect x="15" y="6" width="2.4" height="5" rx="1.2" fill="currentColor"/><rect x="11.8" y="15" width="2.4" height="5" rx="1.2" fill="currentColor"/></svg>Odù de Ifá</a>
+  <nav id="topnav"></nav>
+</header>
+<main id="main"><p class="loading">Cargando…</p></main>
+<footer class="bottom"><a href="/">← Volver a Odù de Ifá</a></footer>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/lib/marked.umd.min.js" integrity="sha384-g+bkfjJw18BIw5cMo99rClhgmX+PThUSSYYevb6sk76sliU2l+O7/cj5q1Nbl3Cw" crossorigin="anonymous"></script>
+<script>
+const DOCS = [
+  {slug:"aviso-privacidad", file:"01-aviso-privacidad-lfpdppp.md", titulo:"Aviso de Privacidad"},
+  {slug:"privacidad",       file:"02-politica-privacidad.md",      titulo:"Política de Privacidad"},
+  {slug:"terminos",         file:"03-terminos-condiciones.md",     titulo:"Términos y Condiciones"},
+  {slug:"descargo",         file:"04-descargo-responsabilidad.md", titulo:"Descargo de Responsabilidad"},
+  {slug:"cookies",          file:"05-politica-cookies.md",         titulo:"Política de Cookies"},
+  {slug:"cobros",           file:"06-terminos-cobros-pagos.md",    titulo:"Cobros y Pagos"},
+  {slug:"menores",          file:"07-politica-menores.md",         titulo:"Política de Menores"},
+  {slug:"contenido",        file:"08-derechos-contenido.md",       titulo:"Derechos de Contenido"},
+  {slug:"encargados",       file:"09-acuerdo-procesamiento-encargados.md", titulo:"Encargados del Tratamiento"}
+];
+const $ = s => document.querySelector(s);
+function slugActual(){
+  const m = location.pathname.match(/\/legal\/?([^/]*)/);
+  return m ? decodeURIComponent(m[1] || "") : "";
+}
+$("#topnav").innerHTML = DOCS.map(d => `<a href="/legal/${d.slug}" class="${d.slug===slugActual()?"on":""}">${d.titulo}</a>`).join("");
+async function render(){
+  const slug = slugActual();
+  const doc = DOCS.find(d => d.slug === slug);
+  if(!doc){
+    document.title = "Legal · Odù de Ifá";
+    $("#main").innerHTML = `<h1 style="font-family:var(--serif);margin:0 0 6px">Documentos legales</h1><p class="muted" style="margin:0 0 22px">Odù de Ifá — avisos, términos y políticas.</p><ul class="idx">${DOCS.map(d=>`<li><a href="/legal/${d.slug}">${d.titulo}</a></li>`).join("")}</ul>`;
+    return;
+  }
+  document.title = doc.titulo + " · Odù de Ifá";
+  try{
+    const res = await fetch("/legal-docs/" + doc.file);
+    if(!res.ok) throw new Error();
+    const md = await res.text();
+    $("#main").innerHTML = `<div class="doc">${marked.parse(md)}</div>`;
+  }catch(e){
+    $("#main").innerHTML = `<p class="muted">No se pudo cargar este documento. Intenta de nuevo más tarde.</p>`;
+  }
+}
+render();
+</script>
+</body>
+</html>

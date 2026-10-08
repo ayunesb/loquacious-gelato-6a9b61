@@ -1,0 +1,22 @@
+ODÙ DE IFÁ · VERSIÓN 32
+
+Publicar el sitio (con la app Android):
+1. Cierra todas las pestañas del sitio.
+2. Netlify > sitio > pestaña Deploys > arrastra ESTA carpeta completa.
+   Tiene que incluir odu-de-ifa.apk y descargar.html.
+3. En el teléfono, abre el sitio y toca App Android, o entra a /descargar.html.
+
+La app no es una PWA. Es un APK firmado (app.odudeifa, versión 32).
+Al instalarla queda con su propio icono. El contenido va dentro de la app
+y las consultas siguen guardándose en la cuenta de Supabase.
+
+No subas a Netlify la carpeta de claves. El keystore sirve solo para
+publicar una actualización de la misma app sin que el teléfono pida desinstalar.
+
+Cambios 29: la lista de Odù se desplaza completa en el teléfono. Abajo: Odù, Estera, Cánticos, Vocabulario y Más. Estudios ya no aparece. El administrador edita también el diccionario.
+
+Cambios 30: menú inferior fijo. La página ya no se sale de la pantalla. Admin en fichas, no en tabla ancha.
+
+Cambios 31: Vocabulario y Diccionario son una sola sección, con dos pestañas. Orichas está en Más.
+
+Cambios 32: la app lee lpt_fichas. Lukumi está en Más y en la pestaña del libro.
