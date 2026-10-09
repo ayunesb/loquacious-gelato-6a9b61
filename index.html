@@ -2555,16 +2555,19 @@ function personasFiltradas(){
 }
 let est = {nombre: "", fecha: "", slots: [null, null, null], notas: {}, activo: 0, q: ""}, expAbierto = null, estMsg = "";
 let estLecturas = {}, estLecturasCargando = new Set(), estCategoriaAbierta = "";
-let estSintesis = null, estSintesisCargando = false;
-async function cargarSintesisEstera(){
-  if(estSintesis !== null || estSintesisCargando) return;
-  estSintesisCargando = true;
+let estSintesis = {}, estSintesisCargando = new Set(), estSintesisConsultada = new Set(), estSintesisError = new Set();
+async function cargarSintesisEstera(id){
+  const numero = odus.find(x=>x.id===id)?.numero;
+  if(!numero || estSintesisConsultada.has(numero) || estSintesisCargando.has(numero)) return;
+  estSintesisCargando.add(numero);
   try{
-    const r = await fetch("estera-sintesis.json", {cache:"no-cache"});
-    if(!r.ok) throw new Error("No se pudo cargar la síntesis");
-    estSintesis = await r.json();
-  }catch(e){ estSintesis = {}; }
-  finally{ estSintesisCargando = false; if(view === "estera") renderDetail(); }
+    const {data, error} = await sb.from("estera_sintesis").select("numero,titulo,secciones").eq("numero",numero).maybeSingle();
+    if(error) throw error;
+    if(data) estSintesis[numero] = data;
+    estSintesisConsultada.add(numero);
+    estSintesisError.delete(numero);
+  }catch(e){ estSintesisConsultada.add(numero); estSintesisError.add(numero); }
+  finally{ estSintesisCargando.delete(numero); if(view === "trazar") renderTrazar(); }
 }
 function estSintesisHTML(id){
   const o = odus.find(x=>x.id===id), ficha = estSintesis?.[o?.numero];
@@ -2991,7 +2994,6 @@ function renderEstera(){
   const listo = !falta;
   const visibles = est.slots[1] ? 3 : est.slots[0] ? 2 : 1;
   const act = est.slots[est.activo] || est.slots.find(Boolean);
-  if(act) cargarSintesisEstera();
   for(const id of est.slots.filter(Boolean)) cargarLecturaEstera(id);
   const res = buscarOdus(est.q);
   const lista = personasFiltradas();
@@ -3038,7 +3040,7 @@ function renderEstera(){
       ${est.ori ? `<div class="field"><select id="estTipo" aria-label="De qué tipo">${tipoOptions(est.ori, est.tipo)}</select></div>${lptTipoNota(est.ori, est.tipo)}` : ""}</div>
     </section>
 
-    ${act?`<section class="blk"><h3><span class="est-step">4</span>Lectura de ${esc(oduName(act))}</h3>${estSintesisHTML(act)}<div class="est-reading">${estLecturaHTML(act)}</div></section>`:""}
+    ${act?`<section class="blk"><h3><span class="est-step">4</span>Lectura de ${esc(oduName(act))}</h3><div class="est-reading">${estLecturaHTML(act)}</div></section>`:""}
 
     <section class="blk"><h3><span class="est-step">5</span>Ebbó confirmado</h3><p class="est-hint">Registra únicamente la obra que se marcó en esta consulta; las mencionadas en los libros son referencias.</p>
       <div class="seg">${[["pendiente","Pendiente"],["cumplido","Cumplido"],["no marcó","No se marcó"]].map(([v,t])=>`<button class="neu" data-ebbo="${v}" aria-pressed="${est.ebbo===v}">${t}</button>`).join("")}</div>
@@ -3257,11 +3259,11 @@ function renderTracer(){
   $("#trRes").textContent = o ? `${o.numero} · ${o.nombre}` : "";
 }
 $("#fTrazar").onclick = () => { trazaDestino = "abrir"; trazaReset(); setView("trazar"); };
-let trazaLecturaId = "", trazaLectura = "";
 function renderTrazar(){
   const puestas = [...traza.L, ...traza.R].filter(Boolean).length;
   const o = puestas === 8 ? oduPorPatron(traza.R.join(""), traza.L.join("")) : null;
   const desdeEstera = trazaDestino === "estera";
+  if(o) cargarSintesisEstera(o.id);
   const col = (side, t) => `<div class="trz-col"><h4>${t}</h4>${traza[side].map((v,i) => `<button class="trz-mark ${v?"":"vacia"}" data-tm="${side}${i}" aria-label="${t} fila ${i+1}: ${v==="1"?"una línea":v==="2"?"dos líneas":"sin marcar"}">${v==="2"?"<span></span><span></span>":"<span></span>"}</button>`).join("")}</div>`;
   $("#main").innerHTML = `<div class="trz">
     <div class="phead">${volverBtn()}<h1>Trazar el signo</h1><span class="r"><button class="linkbtn muted" id="trzBorrar">Borrar</button></span></div>
@@ -3271,28 +3273,16 @@ function renderTrazar(){
         ${desdeEstera ? `<button class="btn primary" id="trzEstera">Volver a la estera</button>` : `<button class="btn primary" id="trzAbrir">Ver la lectura</button>`}
       </div>` : ""}
     </div>
-    ${desdeEstera && o ? `<div class="page" id="trzLectura">${trazaLecturaId===o.id ? trazaLectura : `<p class="muted">Cargando la lectura…</p>`}</div>` : ""}
+    ${o ? `<div class="page" id="trzSintesis">${estSintesisHTML(o.id) || `<p class="muted">${estSintesisError.has(o.numero) ? "No se pudo cargar la síntesis." : !estSintesisConsultada.has(o.numero) ? "Cargando la síntesis…" : "La síntesis de este signo aún no está disponible."}</p>`}</div>` : ""}
   </div>`;
   document.querySelectorAll("[data-tm]").forEach(b => b.onclick = () => {
     const s = b.dataset.tm[0], i = +b.dataset.tm[1];
     traza[s][i] = traza[s][i] === "1" ? "2" : "1"; renderTrazar();
   });
-  $("#trzBorrar").onclick = () => { trazaReset(); trazaLecturaId = ""; trazaLectura = ""; renderTrazar(); };
+  $("#trzBorrar").onclick = () => { trazaReset(); renderTrazar(); };
   const a = $("#trzAbrir"); if(a) a.onclick = () => openOdu(o.id);
   const e = $("#trzEstera"); if(e) e.onclick = () => aLaEstera(o.id);
   if(desdeEstera) document.querySelectorAll("[data-volver]").forEach(b => b.onclick = ev => { ev.stopPropagation(); if(o) aLaEstera(o.id); else setView("estera"); });
-  if(desdeEstera && o && trazaLecturaId !== o.id){
-    trazaLecturaId = o.id;
-    sb.from("textos").select("*").eq("odu_id", o.id).then(r => {
-      if(trazaLecturaId !== o.id) return;
-      const prev = textos;
-      textos = {};
-      for(const row of (r.data || [])) textos[row.libro] = textoFromRow(row);
-      trazaLectura = r.error ? `<p class="muted">No se pudo cargar la lectura.</p>` : contentHTML(o);
-      textos = prev;
-      if(view === "trazar") renderTrazar();
-    });
-  }
 }
 $("#trReset").onclick = () => { traza = {R: "1111".split(""), L: "1111".split("")}; renderTracer(); };
 $("#trGo").onclick = () => { const o = oduPorPatron(traza.R.join(""), traza.L.join("")); if(!o) return; $("#dlgTrazar").close(); if(trazaDestino === "estera") estPoner(o.id); else openOdu(o.id); };
