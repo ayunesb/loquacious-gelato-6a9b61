@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Biblioteca de los 256 Odù de Ifá: búsqueda por nombre o número, marcas, textos por libro y registros privados de consultas.">
+<meta name="description" content="Biblioteca de los 256 Odù de Ifá: búsqueda por nombre o número, marcas, contenido reunido por categoría y registros privados de consultas.">
 <meta name="theme-color" content="#1F3B2D">
 <meta property="og:title" content="Odù de Ifá">
 <meta property="og:description" content="Los 256 Odù de Ifá, a una búsqueda de distancia.">
@@ -62,6 +62,8 @@ img{max-width:100%}
 .rail-tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .count{font-size:.85rem;color:var(--muted);padding:8px 18px}
 .list{list-style:none;margin:0;padding:0 8px 16px;overflow-y:auto;flex:1}
+.rail-foot{border-top:1px solid var(--rule);padding:10px 18px;background:var(--paper)}
+.rail-foot button{width:100%;text-align:left}
 .item{display:grid;grid-template-columns:44px 1fr 38px;gap:10px;align-items:center;width:100%;text-align:left;padding:9px 10px;border:0;border-radius:10px;background:none;cursor:pointer}
 .item:hover{background:var(--green-soft)}
 .item[aria-current="true"]{background:var(--green);color:var(--paper)}
@@ -390,7 +392,7 @@ details.mas summary{cursor:pointer;font-weight:700;color:var(--green)}
 </head>
 <body>
 <div class="app" id="app">
-  <nav class="topbar" id="topbar" aria-label="Libros"></nav>
+  <nav class="topbar" id="topbar" aria-label="Navegación principal"></nav>
   <aside class="rail">
     <div class="rail-head">
       <p class="brand" id="railBrand"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="6" width="2.4" height="5" rx="1.2" fill="currentColor"/><rect x="15" y="6" width="2.4" height="5" rx="1.2" fill="currentColor"/><rect x="11.8" y="15" width="2.4" height="5" rx="1.2" fill="currentColor"/></svg>Odù de Ifá</p>
@@ -398,12 +400,11 @@ details.mas summary{cursor:pointer;font-weight:700;color:var(--green)}
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="q" type="search" placeholder="Buscar por nombre o número" aria-label="Buscar Odù por nombre o número" autocomplete="off">
       </div>
-      <div class="bookchips" id="bookChips"></div>
       <div class="filters" id="filters">
         <button id="fTrazar">Trazar signo</button>
         <button id="fEstera">Tablero</button>
         <button id="fMeji" aria-pressed="false">Solo méjì</button>
-        <button id="fTexto" aria-pressed="false">Con texto en este libro</button>
+        <button id="fTexto" aria-pressed="false">Con contenido</button>
       </div>
       <div class="rail-tools">
         <button class="btn primary" id="btnNew" hidden>Agregar Odù</button>
@@ -416,6 +417,7 @@ details.mas summary{cursor:pointer;font-weight:700;color:var(--green)}
     </div>
     <p class="count" id="count"></p>
     <ul class="list" id="list"></ul>
+    <div class="rail-foot"><button class="btn" id="openDilogun" type="button">Signos del dilogún</button></div>
   </aside>
   <main id="main"></main>
   <nav class="bottomnav" id="bottomnav" aria-label="Navegación principal"></nav>
@@ -695,17 +697,31 @@ function setBook(id){
   loadTextIds(); renderDetail();
 }
 function activeBook(){
-  if(currentBook === "todos") return "todos";
-  if(libros.some(b => b.id === currentBook)) return currentBook;
+  // La lectura pública siempre reúne los textos; la fuente sigue en la base
+  // de datos para edición y control interno.
   return "todos";
 }
 
 /* ---------- Lista ---------- */
-let lptIndex = null, lptErr = "", lptSec = "oddu", lptAbierta = null, lptTexto = "";
-async function lptCargar(){
-  const { data, error } = await sb.from("lpt_fichas").select("id,seccion,titulo,par,pagina,orden").order("orden").limit(1000);
+let lptIndex = null, lptManifest = null, lptErr = "", lptSec = "oddu", lptAbierta = null, lptTexto = "", lptCaminos = [], lptOriCantos = [], lptCarga = null;
+function lptCargar(){
+  if(lptCarga) return lptCarga;
+  lptCarga = (async () => {
+  const [{ data, error }, mapa] = await Promise.all([
+    sb.from("lpt_fichas").select("id,seccion,titulo,par,pagina,orden").order("orden").limit(1000),
+    fetch("lpt-integracion.json").then(r => { if(!r.ok) throw Error("No se pudo leer el índice organizado"); return r.json(); }).catch(() => null)
+  ]);
   lptIndex = data || [];
-  lptErr = error ? (error.message || "No se pudo leer lpt_fichas") : "";
+  lptManifest = mapa;
+  if(mapa){
+    for(const [id, titulo] of [["base-orula","Orula"],["base-egun","Egun"]]){
+      lptIndex.push({id, titulo, seccion:"oricha", orden:1000});
+      mapa.grupos.orichas.push(id);
+    }
+  }
+  lptErr = error ? (error.message || "No se pudo leer lpt_fichas") : !mapa ? "No se pudo leer el índice organizado" : "";
+  })();
+  return lptCarga;
 }
 function lptLimpio(t){
   return (t || "")
@@ -727,15 +743,31 @@ const LPT_CAMPOS = [
   ["enfermedades", /^Enfermedades relacionadas con el (?:Od[uù]|Oddu)\s*:\s*(.*)$/i, "Enfermedades relacionadas"],
   ["prohibiciones", /^Prohibiciones\s*:\s*(.*)$/i, "Prohibiciones"],
   ["nacimientos", /^Nacimientos que se dan en el (?:Od[uù]|Oddu).*?:\s*(.*)$/i, "Nacimientos"],
+  ["odu-positivo", /^En el (?:Od[uù]|Oddu)\s*\+\s*:?\s*[†]?\s*(.*)$/i, "En el signo positivo"],
+  ["odu-negativo", /^En el (?:Od[uù]|Oddu)\s*-\s*:?\s*[†]?\s*(.*)$/i, "En el signo negativo"],
   ["sacrificios", /^Sacrificio de nacimiento y base del (?:od[uù]|oddu)[.:]?\s*(.*)$/i, "Sacrificios"],
   ["sacrificio-nacimiento", /^Sacrificio de nacimiento del (?:od[uù]|oddu)\s*:\s*(.*)$/i, "Sacrificio de nacimiento"],
   ["sacrificio-base", /^Sacrificio base del (?:od[uù]|oddu)\s*:\s*(.*)$/i, "Sacrificio base"]
 ];
-function lptSecciones(t){
+const LPT_ORICHA_CAMPOS = [
+  ["quien", /^Qui[eé]n es [^\n]{2,60}[?.]\s*$/i, "Quién es"],
+  ["familia", /^Familia de [^\n]{2,60}\.\s*$/i, "Familia"],
+  ["dilogun", /^Dilogg[uú]n en [^\n]{2,60}\.\s*$/i, "Dilogún"],
+  ["herramientas", /^Herramientas de [^\n]{2,60}\.\s*$/i, "Herramientas"],
+  ["objetos", /^Objetos de poder de [^\n]{2,60}\.\s*$/i, "Objetos de poder"],
+  ["trajes", /^Trajes de [^\n]{2,60}\.\s*$/i, "Trajes"],
+  ["ofrendas", /^Ofrendas a [^\n]{2,60}\.\s*$/i, "Ofrendas"],
+  ["bailes", /^Bailes de [^\n]{2,60}\.\s*$/i, "Bailes"],
+  ["coronar", /^Coronar [^\n]{2,60}\. Kari-Osha\.\s*$/i, "Coronar"],
+  ["caracteristicas", /^Caracter[ií]sticas (?:generales )?de los Omo [^\n]{2,60}\.\s*$/i, "Características de sus hijos"],
+  ["patakies", /^Patak[ií]es de [^\n]{2,60}\.\s*$/i, "Patakíes"]
+];
+function lptSecciones(t, campos=LPT_CAMPOS){
   const partes = [], lineas = String(t || "").split("\n");
   let actual = {id:"introduccion", titulo:"Introducción", lineas:[]};
   for(const linea of lineas){
-    const campo = LPT_CAMPOS.find(([, patron]) => patron.test(linea.trim()));
+    if(/^Oddu?:\s*$/.test(linea.trim())) continue;
+    const campo = campos.find(([, patron]) => patron.test(linea.trim()));
     if(campo){
       if(actual.lineas.some(x => x.trim())) partes.push(actual);
       const resto = linea.trim().match(campo[1])?.[1] || "";
@@ -745,33 +777,68 @@ function lptSecciones(t){
   if(actual.lineas.some(x => x.trim())) partes.push(actual);
   return partes;
 }
-function lptContenidoHTML(t){
-  const partes = lptSecciones(t);
+function lptContenidoHTML(t, esOricha=false){
+  const partes = lptSecciones(t, esOricha ? LPT_ORICHA_CAMPOS : LPT_CAMPOS);
   if(partes.length < 2) return `<div class="box"><p class="prose" style="white-space:pre-line;margin:0">${esc(t)}</p></div>`;
   return `<nav class="jump" aria-label="Secciones">${partes.map((p,i) => `<a href="#lpt-${p.id}-${i}">${esc(p.titulo)}</a>`).join("")}</nav>
     ${partes.map((p,i) => `<section class="block" id="lpt-${p.id}-${i}"><h2>${esc(p.titulo)}</h2><p class="prose" style="white-space:pre-line">${esc(p.lineas.join("\n").trim())}</p></section>`).join("")}`;
 }
 function lptNombre(e){
-  let s = (e.titulo || "").replace(/\([^)]*\)/g, " ").replace(/†/g, " ").replace(/\s+/g, " ").trim();
+  let s = (e.titulo || "").replace(/[Оо]/g, c => c === "О" ? "O" : "o").replace(/\([^)]*\)/g, " ").replace(/†/g, " ").replace(/\s+/g, " ").trim();
   if (s.length > 48 || /[.?]/.test(s)) s = "";
   return s || (e.par || "");
 }
 function lptFiltradas(){
   const q = norm($("#q")?.value || "");
+  const ids = lptSec === "oddu" ? Object.values(lptManifest?.signos || {}) : (lptManifest?.grupos?.[lptSec] || []);
+  const permitidos = new Set(ids);
   return (lptIndex || []).filter(e => {
-    const secOk = lptSec === "todo" || e.seccion === lptSec || (lptSec === "oddu" && e.seccion === "consulta");
-    if(!secOk) return false;
+    if(!permitidos.has(e.id)) return false;
     if(!q) return true;
     return norm([e.titulo, e.par].join(" ")).includes(q);
   });
 }
+const LPT_ORI_BASE = {
+  "oricha-elegua":"Elegguá", "oricha-oggun":"Oggún", "oricha-oshosi":"Ochosi",
+  "oricha-obatala":"Obatalá", "oricha-yemaya":"Yemayá", "oricha-shango":"Changó",
+  "oricha-oshun":"Oshún", "oricha-oya":"Oyá", "oricha-babalu-aye":"Babalú Ayé",
+  "oricha-aggayu":"Aganyú", "oricha-inle":"Inle", "oricha-bba":"Obba",
+  "oricha-yewa":"Yewá", "oricha-nana-buruku":"Naná Burukú",
+  "base-orula":"Orula", "base-egun":"Egun"
+};
+function lptOrichaComplemento(id){
+  const b = ORI_BASE.find(x => x.nombre === LPT_ORI_BASE[id]);
+  if(!b) return "";
+  const nota = oriNotaDe(b.nombre)?.texto || b.nota || "";
+  return `<section class="block" id="lpt-datos-casa"><h2>Datos reunidos</h2>
+    <div class="box"><p class="prose">${[b.otros && `También: ${b.otros}`, b.colores && `Colores: ${b.colores}`, b.numero && `Número: ${b.numero}`, b.herramientas && `Herramientas: ${b.herramientas}`].filter(Boolean).map(esc).join("<br>")}</p></div>
+    ${nota ? `<p class="prose">${esc(nota)}</p>` : ""}</section>
+    ${lptOriCantos.length ? `<section class="block" id="lpt-canticos"><h2>Cánticos y rezos</h2>${lptOriCantos.map(c => `<article class="verse"><h3>${esc(c.titulo || c.tipo || "Rezo")}</h3>${c.texto_original ? `<p class="prose yo">${esc(c.texto_original)}</p>` : ""}${c.traduccion ? `<p class="prose">${esc(c.traduccion)}</p>` : ""}${c.notas ? `<p class="prose">${esc(c.notas)}</p>` : ""}</article>`).join("")}</section>` : ""}`;
+}
 async function lptAbrir(id){
-  lptAbierta = id; lptTexto = "";
+  lptAbierta = id; lptTexto = ""; lptCaminos = []; lptOriCantos = [];
   renderDetail();
-  const { data, error } = await sb.from("lpt_fichas").select("texto,titulo,pagina,par,seccion").eq("id", id).maybeSingle();
+  const { data, error } = id.startsWith("base-") ? {data:{texto:""},error:null} : await sb.from("lpt_fichas").select("texto,titulo,pagina,par,seccion").eq("id", id).maybeSingle();
   if(lptAbierta !== id) return;
   lptTexto = error ? (error.message || "No se pudo abrir") : lptLimpio(data?.texto || "");
   renderDetail();
+  const b = ORI_BASE.find(x => x.nombre === LPT_ORI_BASE[id]);
+  if(b){
+    if(oriNotas === null) await oriCargar();
+    const r = await sb.from("canticos_rezos").select("id,tipo,titulo,orisha,texto_original,traduccion,notas").ilike("orisha", `%${b.nombre.split(" ")[0]}%`).limit(100);
+    if(lptAbierta !== id) return;
+    lptOriCantos = r.data || [];
+    renderDetail();
+  }
+  const parent = Object.entries(lptManifest?.orichas_principales || {}).find(([,baseId]) => baseId === id)?.[0];
+  const ids = lptManifest?.caminos_por_oricha?.[parent] || [];
+  if(ids.length){
+    const r = await sb.from("lpt_fichas").select("id,titulo,texto").in("id", ids).limit(200);
+    if(lptAbierta !== id) return;
+    const orden = new Map(ids.map((value,i) => [value,i]));
+    lptCaminos = (r.data || []).sort((a,b) => orden.get(a.id) - orden.get(b.id));
+    renderDetail();
+  }
 }
 function renderLukumi(titulo){
   if(lptIndex === null){
@@ -781,19 +848,31 @@ function renderLukumi(titulo){
   }
   if(lptAbierta){
     const f = lptIndex.find(x => x.id === lptAbierta);
+    const relatos = (lptManifest?.patakies_por_oricha?.[lptAbierta] || []).map(id => lptIndex.find(x => x.id === id)).filter(Boolean);
     $("#main").innerHTML = `<div class="page">${phead(lptNombre(f || {}))}
-      ${lptTexto ? lptContenidoHTML(lptTexto) : `<div class="box">Cargando…</div>`}
+      ${lptAbierta.startsWith("base-") ? "" : lptTexto ? lptContenidoHTML(lptTexto, view === "orichas" && (lptManifest?.grupos?.orichas || []).includes(lptAbierta)) : `<div class="box">Cargando…</div>`}
+      ${view === "orichas" && lptSec === "orichas" ? lptOrichaComplemento(lptAbierta) : ""}
+      ${lptCaminos.length ? `<section class="block" id="lpt-caminos"><h2>Caminos</h2>${lptCaminos.map(x => `<details class="mas"><summary>${esc(x.titulo)}</summary><p class="prose">${esc(lptLimpio(x.texto))}</p></details>`).join("")}</section>` : ""}
+      ${relatos.length ? `<section class="block" id="lpt-relatos"><h2>Patakíes que nombran a esta entidad</h2><div class="cards">${relatos.map(x => `<button class="card" data-lpt-relato="${esc(x.id)}"><span class="who">${esc(lptNombre(x))}</span></button>`).join("")}</div></section>` : ""}
       <button class="btn" id="lptVolver" style="margin-top:14px">Volver</button>
     </div>`;
-    $("#lptVolver").onclick = () => { lptAbierta = null; lptTexto = ""; renderDetail(); };
+    $("#lptVolver").onclick = () => { lptAbierta = null; lptTexto = ""; lptCaminos = []; renderDetail(); };
+    document.querySelectorAll("[data-lpt-relato]").forEach(b => b.onclick = () => { lptSec = "patakies"; lptAbrir(b.dataset.lptRelato); });
     renderList();
     return;
   }
   const items = lptFiltradas();
+  const opciones = view === "orichas"
+    ? [["orichas","Orichas"],["caminos","Caminos"],["patakies","Patakíes"],["contexto_orichas","Contexto"],["vocabulario","Animales y términos"]]
+    : [["oddu","Signos"],["ire","Iré"],["osogbo","Osogbo"],["contexto_dilogun","Consulta y contexto"]];
+  const categorias = `<div class="filters" aria-label="Categorías">${opciones.map(([id,nombre]) => `<button type="button" data-lptsec="${id}" aria-pressed="${lptSec===id}">${nombre}</button>`).join("")}</div>`;
   $("#main").innerHTML = `<div class="page">${phead(titulo)}
     ${lptErr?`<p class="sub">${esc(lptErr)}</p>`:""}
-    <div class="cards">${items.slice(0,120).map(e => `<button class="card" data-lpt="${esc(e.id)}"><div class="top"><span class="who">${esc(lptNombre(e))}</span></div></button>`).join("") || `<div class="box"><p style="margin:0">No hay fichas.</p></div>`}</div>
+    ${categorias}
+    <p class="muted">${items.length} ${items.length===1?"entrada":"entradas"}</p>
+    <div class="cards">${items.map(e => `<button class="card" data-lpt="${esc(e.id)}"><div class="top"><span class="who">${esc(lptNombre(e))}</span></div></button>`).join("") || `<div class="box"><p style="margin:0">No hay fichas.</p></div>`}</div>
   </div>`;
+  document.querySelectorAll("[data-lptsec]").forEach(b => b.onclick = () => { lptSec = b.dataset.lptsec; lptAbierta = null; renderList(); renderDetail(); });
   document.querySelectorAll("[data-lpt]").forEach(b => b.onclick = () => lptAbrir(b.dataset.lpt));
   renderList();
 }
@@ -802,7 +881,7 @@ function renderList(){
     if(lptIndex === null){ $("#count").textContent = "Cargando…"; $("#list").innerHTML = ""; lptCargar().then(() => renderList()); return; }
     const items = lptFiltradas();
     $("#count").textContent = "";
-    $("#list").innerHTML = items.slice(0,200).map(e => `<li><button class="item" data-lpt="${esc(e.id)}" aria-current="${lptAbierta===e.id}"><span class="num">${esc(e.par || "")}</span><span class="nm">${esc(lptNombre(e) === e.par ? "" : lptNombre(e))}</span></button></li>`).join("");
+    $("#list").innerHTML = items.map(e => `<li><button class="item" data-lpt="${esc(e.id)}" aria-current="${lptAbierta===e.id}"><span class="num">${esc(e.par || "")}</span><span class="nm">${esc(lptNombre(e) === e.par ? "" : lptNombre(e))}</span></button></li>`).join("");
     document.querySelectorAll("#list [data-lpt]").forEach(b => b.onclick = () => lptAbrir(b.dataset.lpt));
     return;
   }
@@ -831,22 +910,12 @@ const notice = () => `<p class="notice">Estás viendo una vista sin base de dato
 function renderTabs(){
   const act = activeBook();
   const brand = `<p class="brand">${$("#railBrand").innerHTML}</p>`;
-  const tabs = libros.map(b => `
-    <button class="tab" role="tab" data-book="${esc(b.id)}" aria-selected="${b.id===act}">
-      <span class="t">${esc(b.titulo)}${current && hasText(textos[b.id])?`<span class="dot" title="Tiene texto para este Odù"></span>`:""}</span>
-      ${b.autor?`<span class="a">${esc(b.autor)}</span>`:""}
-    </button>`).join("");
-  const add = canWrite ? `<button class="tab add" id="tabAdd">Agregar libro</button>` : "";
   const navItems = [["biblioteca",tr("nav.odu")],["estera",tr("nav.estera")],["canticos",tr("nav.canticos")],["orichas",tr("nav.orichas")],["vocabulario",tr("nav.vocabulario")],["espacio",tr("nav.espacio")],["perfil",tr("nav.perfil")]];
   if(canWrite) navItems.push(["admin",tr("nav.admin")]);
   const nav = `<div class="secnav">${navItems.map(([k,t])=>`<button data-view="${k}" aria-current="${view===k?"page":"false"}">${t}</button>`).join("")}</div>`;
   const langBtn = `<button class="langbtn" id="langSwitch" aria-label="${tr("login.idioma")}" title="${tr("login.idioma")}">${LANG.toUpperCase()}</button>`;
   $("#topbar").innerHTML = brand + nav + langBtn;
   $("#topbar").querySelectorAll("[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
-  const chips = view === "biblioteca" ? `<button type="button" data-book="todos" aria-selected="${act==="todos"}">Contenido reunido de Ifá</button>` + libros.map(b => `<button type="button" data-book="${esc(b.id)}" aria-selected="${b.id===act}">${esc(b.titulo)}</button>`).join("") : "";
-  const host = $("#bookChips");
-  if(host) host.innerHTML = chips;
-  document.querySelectorAll("[data-book]").forEach(b => b.onclick = () => setBook(b.dataset.book));
   $("#langSwitch").onclick = () => setLang(LANG === "es" ? "en" : "es");
   renderBottomNav();
 }
@@ -862,7 +931,7 @@ const BN_ICONS = {
 function renderBottomNav(){
   const bn = $("#bottomnav");
   const principal = [["biblioteca",tr("nav.odu")],["estera",tr("nav.estera")],["canticos",tr("nav.canticosCorto")],["vocabulario",tr("nav.vocabulario")]];
-  const resto = [["orichas",tr("nav.orichas")],["espacio",tr("nav.espacio")],["perfil",tr("nav.perfil")]];
+  const resto = [["orichas",tr("nav.orichas")],["lukumi","Dilogún"],["espacio",tr("nav.espacio")],["perfil",tr("nav.perfil")]];
   if(canWrite) resto.push(["admin",tr("nav.admin")]);
   const enResto = resto.some(([k]) => k === view);
   bn.innerHTML = principal.map(([k,t]) => `<button data-view="${k}" aria-current="${(view===k || (k==="vocabulario" && view==="diccionario"))?"page":"false"}">${BN_ICONS[k]}<span>${t}</span></button>`).join("")
@@ -922,15 +991,16 @@ function contentHTML(o){
 }
 function contenidoUnificadoHTML(){
   const fichas = Object.values(textos).filter(hasText);
-  if(!fichas.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
-  const campos = [["caracterizacion","Caracterización"],["wo","Wo"],["caracteristicas","Características generales"],["consejo","Consejo"]];
+  if(!fichas.length && !oduCanticos.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
+  const campos = [["caracterizacion","Caracterización"],["wo","WO · Entorno actual"],["caracteristicas","Características generales"],["consejo","Consejo"]];
   const bloques = campos.map(([clave,titulo]) => {
     const valores = [...new Set(fichas.map(t => (t[clave] || "").trim()).filter(Boolean))];
-    return valores.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
+    const soloNombres = clave === "caracteristicas" && valores.length && valores.every(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v));
+    return valores.length && !soloNombres ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
   }).join("");
   const vistos = new Set(), versos = [];
   for(const ficha of fichas) for(const v of (ficha.versos || [])){
-    const clave = JSON.stringify(v);
+    const clave = JSON.stringify([v.ref,v.yoruba,v.traduccion,v.comentario,v.ebbo,v.hierbas,v.canticos,v.medicina,v.orichas]);
     if(!vistos.has(clave)){ vistos.add(clave); versos.push(v); }
   }
   const datos = [["ebbo","Ebós"],["hierbas","Plantas y hierbas"],["orichas","Orichas relacionados"],["canticos","Cánticos"],["medicina","Medicina de Ifá"]];
@@ -938,12 +1008,15 @@ function contenidoUnificadoHTML(){
     const entradas = versos.map((v,i) => ({ref:v.ref || `Verso ${i+1}`, texto:(v[clave] || "").trim()})).filter(x => x.texto);
     return entradas.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${entradas.map(x => `<div class="box"><p class="lbl">${esc(x.ref)}</p><p class="prose">${esc(x.texto)}</p></div>`).join("")}</section>` : "";
   }).join("");
-  const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<p class="prose yo">${esc(v.yoruba)}</p>`:""}${v.traduccion?`<p class="prose">${esc(v.traduccion)}</p>`:""}${v.comentario?`<p class="prose">${esc(v.comentario)}</p>`:""}</article>`).join("")}</section>` : "";
+  const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos y relatos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<div><p class="lbl">Yorùbá</p><p class="prose yo">${esc(v.yoruba)}</p></div>`:""}${v.traduccion?`<div><p class="lbl">Traducción</p><p class="prose">${esc(v.traduccion)}</p></div>`:""}${v.comentario?`<div><p class="lbl">Relato o comentario</p><p class="prose">${esc(v.comentario)}</p></div>`:""}</article>`).join("")}</section>` : "";
   const contenido = bloques + temas + versoHTML;
   const enlaces = [...contenido.matchAll(/<section class="block" id="s-([^"]+)"><h2>([^<]+)<\/h2>/g)]
     .map(([,id,titulo]) => `<a href="#s-${id}">${titulo}</a>`);
   if(oduCanticos.length) enlaces.push(`<a href="#s-rezos">Rezos y cánticos</a>`);
   return (enlaces.length ? `<nav class="jump" aria-label="Secciones">${enlaces.join("")}</nav>` : "") + contenido;
+}
+function nombresSoloReferencia(){
+  return [...new Set(Object.values(textos).filter(hasText).map(t => (t.caracteristicas || "").trim()).filter(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v)).map(v => v.replace(/^Otros nombres:\s*/i, "")))];
 }
 function oduCanticosHTML(){
   if(!oduCanticos.length) return "";
@@ -970,8 +1043,8 @@ function renderDetailInner(){
   if(view === "espacio"){ renderEspacio(); return; }
   if(view === "estera"){ renderEstera(); return; }
   if(view === "trazar"){ renderTrazar(); return; }
-  if(view === "orichas"){ lptSec = "oricha"; renderLukumi("Orichas"); return; }
-  if(activeBook() === "lukumi-para-todos" && view === "biblioteca"){ lptSec = lptSec === "oricha" ? "oddu" : lptSec; renderLukumi("Oddus"); return; }
+  if(view === "orichas"){ renderLukumi("Orichas"); return; }
+  if(view === "lukumi"){ renderLukumi("Dilogún"); return; }
   if(view === "diccionario"){ renderDiccionario(); return; }
   if(view === "canticos"){ renderCanticos(); return; }
   if(view === "vocabulario"){ renderVocabulario(); return; }
@@ -986,10 +1059,9 @@ function renderDetailInner(){
   }
   if(!o){
     app.classList.remove("detail");
-    const bk = libros.find(x=>x.id===activeBook());
     const atajo = n => { const x = odus.find(o => o.numero === n); return x ? `<button class="btn" data-atajo="${x.id}">${x.numero} · ${esc(x.nombre)}</button>` : ""; };
-    $("#main").innerHTML = `<div class="portada">${bk?`<p class="hero-num">Tratado</p><h2>${esc(bk.titulo)}</h2>`:""}
-      <p class="muted">256 signos. El enlace guarda el signo y el tratado.</p>
+    $("#main").innerHTML = `<div class="portada"><h2>Contenido reunido de Ifá</h2>
+      <p class="muted">256 signos. Elige uno para leer sus contenidos reunidos por categoría.</p>
       <div class="row"><button class="btn primary" data-go="trazar">Trazar signo</button><button class="btn primary" data-go="estera">Estera</button></div>
       ${odus.length?`<div class="row">${atajo(1)}${atajo(241)}${atajo(256)}</div>`:`<p class="muted">Cargando…</p>`}</div>`;
     document.querySelectorAll("[data-atajo]").forEach(b => b.onclick = () => select(b.dataset.atajo));
@@ -1012,6 +1084,7 @@ function renderDetailInner(){
         <p class="hero-num"><b>${o.numero}</b>en el orden de Ọ̀rúnmìlà</p>
         <h1>${esc(o.nombre)}</h1>
         ${o.otrosNombres?`<p class="legs">También: ${esc(o.otrosNombres)}</p>`:""}
+        ${nombresSoloReferencia().map(v => `<p class="legs">Otros nombres registrados: ${esc(v)}</p>`).join("")}
         ${legsTxt?`<p class="legs">${esc(legsTxt)}</p>`:""}
         <div class="readbar">
           <button class="btn" id="rdPrev" aria-label="Signo anterior">‹ Signo anterior</button>
@@ -1028,7 +1101,7 @@ function renderDetailInner(){
   $("#rdPrev").onclick = () => moverSigno(-1);
   $("#rdNext").onclick = () => moverSigno(1);
   $("#rdCopy").onclick = async () => {
-    const url = location.origin + location.pathname + "#" + o.id + (activeBook() ? "/" + activeBook() : "");
+    const url = location.origin + location.pathname + "#" + o.id;
     try{ await navigator.clipboard.writeText(url); }catch(e){ const t = document.createElement("textarea"); t.value = url; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); }catch(x){} t.remove(); }
     $("#rdCopy").textContent = "Enlace copiado"; setTimeout(() => { const b = $("#rdCopy"); if(b) b.textContent = "Copiar enlace"; }, 2000);
   };
@@ -1045,13 +1118,14 @@ function renderDetailInner(){
 function select(id){
   if(id !== current) libEdit = false;
   current = id; view = "biblioteca";
-  try{ history.replaceState(null,"", id ? "#" + id + (activeBook() ? "/" + activeBook() : "") : location.pathname+location.search); }catch(e){}
+  try{ history.replaceState(null,"", id ? "#" + id : location.pathname+location.search); }catch(e){}
   loadTextos(id);
   renderList(); renderDetail(); window.scrollTo(0,0);
 }
 
 
 $("#list").addEventListener("click", e => { const b = e.target.closest(".item"); if(b) select(b.dataset.id); });
+$("#openDilogun").onclick = () => setView("lukumi");
 $("#q").addEventListener("input", renderList);
 $("#q").addEventListener("keydown", e => { if(e.key === "Enter"){ const f = $("#list .item"); if(f) select(f.dataset.id); } });
 
@@ -1086,7 +1160,7 @@ $("#fAddVerso").onclick = () => verseEditor({ref:`${$("#fNum").value || "1"}.${$
 let editBook = null;
 function openEditor(o){
   editing = o || null;
-  editBook = activeBook();
+  editBook = libros.find(b => b.id === "oraculo-sagrado")?.id || libros[0]?.id || null;
   const b = libros.find(x => x.id === editBook);
   const t = (o && editBook) ? (textos[editBook] || {}) : {};
   $("#dlgTitle").textContent = o ? `Editar ${o.nombre}` : "Agregar Odù";
@@ -1486,11 +1560,15 @@ function goBack(){
 }
 function setView(v){
   if(v !== view) pushNav();
+  if(v !== view && (v === "lukumi" || v === "orichas")){
+    lptSec = v === "lukumi" ? "oddu" : "orichas";
+    lptAbierta = null;
+  }
   view = v;
   try{ history.replaceState(null, "", v === "biblioteca" ? (current ? "#" + current : location.pathname) : "#" + v); }catch(e){}
   if((v === "espacio" || v === "estera") && user && consultas === null) loadConsultas();
   if((v === "estera" || v === "orichas") && lptIndex === null) lptCargar();
-  renderDetail(); window.scrollTo(0,0);
+  renderList(); renderDetail(); window.scrollTo(0,0);
 }
 function openOdu(id, desdeEstera=false){ volverAEstera = desdeEstera; view = "biblioteca"; select(id); }
 const volverBtn = () => `<button class="linkbtn l" data-volver aria-label="${tr("common.volver")}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>${tr("common.volver")}</button>`;
@@ -3229,11 +3307,14 @@ function renderEstera(){
 /* ---------- Herramientas de la lista: filtros, trazar signo, estera ---------- */
 let filtroMeji = false, filtroTexto = false, textIds = new Set();
 async function loadTextIds(){
-  const b = activeBook(); if(!b){ textIds = new Set(); return; }
-  let q = sb.from("textos").select("odu_id").limit(1000);
-  if(b !== "todos") q = q.eq("libro", b);
-  const r = await q;
-  textIds = new Set((r.data || []).map(x => x.odu_id));
+  const ids = new Set();
+  for(let desde = 0; desde < 20000; desde += 1000){
+    const r = await sb.from("textos").select("odu_id").order("odu_id").range(desde, desde + 999);
+    if(r.error) break;
+    for(const x of (r.data || [])) ids.add(x.odu_id);
+    if((r.data || []).length < 1000) break;
+  }
+  textIds = ids;
   renderList();
 }
 $("#fMeji").onclick = () => { filtroMeji = !filtroMeji; $("#fMeji").setAttribute("aria-pressed", filtroMeji); renderList(); };
