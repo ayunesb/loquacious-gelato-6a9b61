@@ -2103,6 +2103,17 @@ async function adminCargar(){
 }
 /* ---------- Canticos, suyeres, oriki, adura, invocaciones y rezos ---------- */
 let canQ = "", canTipo = "", canResults = [], canLoading = false, canDone = false, canSel = null, canTimer = null, canEditing = null, canErr = "";
+
+function fuenteVisible(libro){
+  const nombre=String(libro || "").normalize("NFC").trim();
+  const ocultas=new Set([
+    "Conjunto de información (compilación Ifadowole - Bádé Ajàyí y fuentes asociadas)",
+    "1000 Orisa/Yorùbá Names - Chief FAMA",
+    "Rezos de los 256 Oddun de Ifá"
+  ]);
+  return ocultas.has(nombre) ? "" : nombre;
+}
+
 const CAN_TIPOS = [["","Todos los tipos"],["canto","Canto"],["suyere","Suyeré"],["oriki","Orikì"],["adura","Adurá"],["invocacion","Invocación"],["rezo","Rezo"]];
 async function canBuscar(){
   canLoading = true; renderDetail();
@@ -2203,7 +2214,7 @@ function renderCanticos(){
   if(canSel){
     const c = canSel;
     $("#main").innerHTML = `<div class="page">${palabrasTabs()}${phead(bi(c,"titulo","titulo_en") || (CAN_TIPOS.find(([k])=>k===c.tipo)?.[1] || c.tipo))}
-      <p class="muted" style="margin:0 0 14px">${CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo}${c.odus?` · Odù ${c.odus.numero} · ${esc(c.odus.nombre)}`:""}${c.orisha?` · ${esc(c.orisha)}`:""}${c.libro?` · ${esc(c.libro)}`:""}</p>
+      <p class="muted" style="margin:0 0 14px">${CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo}${c.odus?` · Odù ${c.odus.numero} · ${esc(c.odus.nombre)}`:""}${c.orisha?` · ${esc(c.orisha)}`:""}${fuenteVisible(c.libro)?` · ${esc(fuenteVisible(c.libro))}`:""}</p>
       <div class="box"><p class="lbl">${LANG==="en"?"Original text":"Texto original"}</p><p class="prose" style="white-space:pre-line">${esc(c.texto_original)}</p></div>
       ${bi(c,"traduccion","traduccion_en")?`<div class="box" style="margin-top:14px"><p class="lbl">${LANG==="en"?"Translation":"Traducción"}</p><p class="prose" style="white-space:pre-line">${esc(bi(c,"traduccion","traduccion_en"))}</p></div>`:""}
       ${c.notas?`<div class="box" style="margin-top:14px"><p class="lbl">${LANG==="en"?"Notes":"Notas"}</p><p class="prose" style="white-space:pre-line">${esc(c.notas)}</p></div>`:""}
@@ -2228,7 +2239,7 @@ function renderCanticos(){
     </div>
     ${canEditing==='new'?canEditorHTML():""}
     ${canEditing==='import'?canImportHTML():""}
-    ${canLoading?`<p class="muted">${tr("common.buscando")}</p>`:canDone?`<div class="cards">${canResults.map(c=>{const prev = bi(c,"traduccion","traduccion_en") || c.texto_original || ""; return `<button class="card" data-can="${esc(c.id)}"><div class="top"><span class="who">${esc(bi(c,"titulo","titulo_en")||(CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo))}</span><span class="meta">${CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo}</span></div><p class="meta" style="margin:4px 0">${c.odus?`Odù ${c.odus.numero} · ${esc(c.odus.nombre)}`:""}${c.orisha?` · ${esc(c.orisha)}`:""}${c.libro?` · ${esc(c.libro)}`:""}</p><p style="margin:6px 0 0">${esc(prev.slice(0,140))}${prev.length>140?"…":""}</p></button>`;}).join("")||`<div class="box"><p style="margin:0">${tr("common.sinResultados")}</p></div>`}</div>`:`<div class="box"><p style="margin:0">${tr("common.cargando")}</p></div>`}
+    ${canLoading?`<p class="muted">${tr("common.buscando")}</p>`:canDone?`<div class="cards">${canResults.map(c=>{const prev = bi(c,"traduccion","traduccion_en") || c.texto_original || ""; return `<button class="card" data-can="${esc(c.id)}"><div class="top"><span class="who">${esc(bi(c,"titulo","titulo_en")||(CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo))}</span><span class="meta">${CAN_TIPOS.find(([k])=>k===c.tipo)?.[1]||c.tipo}</span></div><p class="meta" style="margin:4px 0">${c.odus?`Odù ${c.odus.numero} · ${esc(c.odus.nombre)}`:""}${c.orisha?` · ${esc(c.orisha)}`:""}${fuenteVisible(c.libro)?` · ${esc(fuenteVisible(c.libro))}`:""}</p><p style="margin:6px 0 0">${esc(prev.slice(0,140))}${prev.length>140?"…":""}</p></button>`;}).join("")||`<div class="box"><p style="margin:0">${tr("common.sinResultados")}</p></div>`}</div>`:`<div class="box"><p style="margin:0">${tr("common.cargando")}</p></div>`}
   </div>`;
   const inp = $("#canInput"); inp.oninput = () => { canQ = inp.value; clearTimeout(canTimer); canTimer = setTimeout(canBuscar, 350); };
   $("#canTipoSel").onchange = e => { canTipo = e.target.value; canBuscar(); };
@@ -2323,7 +2334,7 @@ function renderVocabulario(){
     const v = vocSel;
     $("#main").innerHTML = `<div class="page">${palabrasTabs()}${phead(v.termino)}
       <p class="muted" style="margin:0 0 14px">${VOC_CATS.find(([k])=>k===v.categoria)?.[1]||v.categoria}</p>
-      ${(v.vocabulario_definiciones||[]).map(d=>`<div class="box" style="margin-bottom:12px"><p class="lbl">${esc(d.libro||"Sin fuente indicada")}</p><p class="prose">${esc(d.definicion)}</p></div>`).join("") || `<div class="box"><p style="margin:0">Todavía no hay definiciones para este término.</p></div>`}
+      ${(v.vocabulario_definiciones||[]).map(d=>`<div class="box" style="margin-bottom:12px">${fuenteVisible(d.libro)?`<p class="lbl">${esc(fuenteVisible(d.libro))}</p>`:""}<p class="prose">${esc(d.definicion)}</p></div>`).join("") || `<div class="box"><p style="margin:0">Todavía no hay definiciones para este término.</p></div>`}
       ${canWrite?`<div class="box" style="margin-top:14px">
         <p class="bookhead">Agregar definición (de otra fuente)</p>
         <div class="field"><label>Libro / fuente</label><input id="vdLibro" placeholder="Bascom, Afolabi, lukumí para todos…"></div>
