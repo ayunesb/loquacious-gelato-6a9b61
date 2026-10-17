@@ -996,6 +996,8 @@ function contenidoUnificadoHTML(){
   const oEst = odus.find(x => x.id === current), fichaEst = estSintesis?.[oEst?.numero];
   if(oEst && !fichaEst) cargarSintesisEstera(current);
   const woEst = fichaEst?.secciones?.find(s => /^WO\b/.test(s.titulo || ""));
+  const hablanEst = fichaEst?.secciones?.find(s => s.hablan?.length)?.hablan || [];
+  const hablanHTML = hablanEst.length ? `<section class="block" id="s-hablan"><h2>Òrìṣà que hablan en este Odù</h2><div class="box"><p class="prose">${hablanEst.map(esc).join(" · ")}</p><p class="muted" style="margin:6px 0 0;font-size:.85em">Según los relatos, rezos y libros de este Odù.</p></div></section>` : "";
   const bloques = campos.map(([clave,titulo]) => {
     if(clave === "wo" && woEst){
       return `<section class="block" id="s-wo"><h2>${esc(woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(woEst.texto)}</p>`:""}${woEst.puntos?.length?`<ul class="prose">${woEst.puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(woEst.cierre)}</p>`:""}</div></section>`;
@@ -1015,7 +1017,7 @@ function contenidoUnificadoHTML(){
     return entradas.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${entradas.map(x => `<div class="box"><p class="lbl">${esc(x.ref)}</p><p class="prose">${esc(x.texto)}</p></div>`).join("")}</section>` : "";
   }).join("");
   const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos y relatos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<div><p class="lbl">Yorùbá</p><p class="prose yo">${esc(v.yoruba)}</p></div>`:""}${v.traduccion?`<div><p class="lbl">Traducción</p><p class="prose">${esc(v.traduccion)}</p></div>`:""}${v.comentario?`<div><p class="lbl">Relato o comentario</p><p class="prose">${esc(v.comentario)}</p></div>`:""}</article>`).join("")}</section>` : "";
-  const contenido = bloques + temas + versoHTML;
+  const contenido = bloques.replace(/(<section class="block" id="s-wo">[\s\S]*?<\/section>)/, m => m + hablanHTML) + (bloques.includes('id="s-wo"') ? "" : hablanHTML) + temas + versoHTML;
   const enlaces = [...contenido.matchAll(/<section class="block" id="s-([^"]+)"><h2>([^<]+)<\/h2>/g)]
     .map(([,id,titulo]) => `<a href="#s-${id}">${titulo}</a>`);
   if(oduCanticos.length) enlaces.push(`<a href="#s-rezos">Rezos y cánticos</a>`);
@@ -2670,7 +2672,7 @@ function estPasajeHTML(p){
   return `<details class="mas est-pasaje" ${p.origen_id?`id="pasaje-${esc(p.origen_id)}"`:""}><summary>${esc(p.titulo || "Pasaje")}</summary><div>${cuerpo}</div></details>`;
 }
 function estSeccionesHTML(secciones){
-  return (secciones || []).filter(s=>s.texto?.trim() || s.puntos?.some(p=>p.trim()) || s.pasajes?.length).map(s=>`<section><h4>${esc(s.titulo)}${s.pasajes?.length?` <span class="muted" style="font-size:.7em">· ${s.pasajes.length}</span>`:""}</h4>${s.introduccion?`<p>${esc(s.introduccion)}</p>`:""}${s.texto?estTextoPasajeHTML(s.texto):""}${s.puntos?.length?`<ul>${s.puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${(s.pasajes || []).map(estPasajeHTML).join("")}${s.cierre?`<p>${esc(s.cierre)}</p>`:""}</section>`).join("");
+  return (secciones || []).filter(s=>s.texto?.trim() || s.puntos?.some(p=>p.trim()) || s.pasajes?.length).map(s=>`<section><h4>${esc(s.titulo)}${s.pasajes?.length?` <span class="muted" style="font-size:.7em">· ${s.pasajes.length}</span>`:""}</h4>${s.introduccion?`<p>${esc(s.introduccion)}</p>`:""}${s.texto?estTextoPasajeHTML(s.texto):""}${s.puntos?.length?`<ul>${s.puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${s.hablan?.length?`<p><b>Òrìṣà que hablan en este Odù:</b> ${s.hablan.map(esc).join(" · ")}</p>`:""}${(s.pasajes || []).map(estPasajeHTML).join("")}${s.cierre?`<p>${esc(s.cierre)}</p>`:""}</section>`).join("");
 }
 function estSintesisHTML(id){
   const o=odus.find(x=>x.id===id), ficha=estSintesis?.[o?.numero];
