@@ -997,7 +997,10 @@ function contenidoUnificadoHTML(){
   if(oEst && !fichaEst) cargarSintesisEstera(current);
   const woEst = fichaEst?.secciones?.find(s => /^WO\b/.test(s.titulo || ""));
   const bloques = campos.map(([clave,titulo]) => {
-    if(clave === "wo" && woEst) return `<section class="block" id="s-wo"><h2>${esc(woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(woEst.texto)}</p>`:""}${woEst.puntos?.length?`<ul class="prose">${woEst.puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(woEst.cierre)}</p>`:""}</div></section>`;
+    if(clave === "wo" && woEst){
+      const delLibro = [...new Set(fichas.map(t => (t.wo || "").trim()).filter(Boolean))];
+      return `<section class="block" id="s-wo"><h2>${esc(woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(woEst.texto)}</p>`:""}${woEst.puntos?.length?`<ul class="prose">${woEst.puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(woEst.cierre)}</p>`:""}</div>${delLibro.map((v,i) => `<div class="box"><p class="lbl">Texto del libro${delLibro.length>1?` ${i+1}`:""}</p><p class="prose">${esc(v)}</p></div>`).join("")}</section>`;
+    }
     const valores = [...new Set(fichas.map(t => (t[clave] || "").trim()).filter(Boolean))];
     const soloNombres = clave === "caracteristicas" && valores.length && valores.every(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v));
     return valores.length && !soloNombres ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
