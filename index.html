@@ -993,7 +993,11 @@ function contenidoUnificadoHTML(){
   const fichas = Object.values(textos).filter(hasText);
   if(!fichas.length && !oduCanticos.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
   const campos = [["caracterizacion","Caracterización"],["wo","WO · Entorno actual"],["caracteristicas","Características generales"],["consejo","Consejo"]];
+  const oEst = odus.find(x => x.id === current), fichaEst = estSintesis?.[oEst?.numero];
+  if(oEst && !fichaEst) cargarSintesisEstera(current);
+  const woEst = fichaEst?.secciones?.find(s => /^WO\b/.test(s.titulo || ""));
   const bloques = campos.map(([clave,titulo]) => {
+    if(clave === "wo" && woEst) return `<section class="block" id="s-wo"><h2>${esc(woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(woEst.texto)}</p>`:""}${woEst.puntos?.length?`<ul class="prose">${woEst.puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(woEst.cierre)}</p>`:""}</div></section>`;
     const valores = [...new Set(fichas.map(t => (t[clave] || "").trim()).filter(Boolean))];
     const soloNombres = clave === "caracteristicas" && valores.length && valores.every(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v));
     return valores.length && !soloNombres ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
@@ -2645,7 +2649,7 @@ async function cargarSintesisEstera(id){
     estSintesisConsultada.add(numero);
     estSintesisError.delete(numero);
   }catch(e){ estSintesisConsultada.add(numero); estSintesisError.add(numero); }
-  finally{ estSintesisCargando.delete(numero); if(view === "trazar") renderTrazar(); }
+  finally{ estSintesisCargando.delete(numero); if(view === "trazar") renderTrazar(); else if(estSintesis[numero] && odus.find(x=>x.id===current)?.numero === numero && activeBook() === "todos" && !["espacio","estera","orichas","lukumi","diccionario","canticos","vocabulario","admin","perfil"].includes(view)) renderDetail(); }
 }
 
 
