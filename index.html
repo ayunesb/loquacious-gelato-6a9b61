@@ -547,7 +547,7 @@ details.mas summary{cursor:pointer;font-weight:700;color:var(--green)}
       <div class="field"><label for="cRefran">Refrán que se dijo</label><input id="cRefran"></div>
       <div class="field"><label for="cProhib">Qué se le prohibió</label><textarea id="cProhib"></textarea></div>
       <div class="field"><label for="cLeyo">Quién leyó</label><input id="cLeyo"></div>
-      <div class="field"><label for="cSigno">Signos (en orden: el que habla, el que acompaña y el que testifica)</label>
+      <div class="field"><label for="cSigno">Signos (en orden: el que habla, el que acompaña, el que testifica y quienes cierran)</label>
         <div style="display:flex;gap:8px"><input id="cSigno" list="oduList" placeholder="Escribe número o nombre" style="flex:1"><button type="button" class="btn" id="cSignoAdd">Agregar</button></div>
         <datalist id="oduList"></datalist>
         <div class="chips" id="cSignos"></div>
@@ -2578,8 +2578,8 @@ function bindPrefs(){
 
 
 /* ---------- Estera: captura rápida y expedientes por persona ---------- */
-const PUESTOS = ["Habla","Acompaña","Testifica"];
-const PUESTO_TXT = ["El que habla","El que acompaña","El que testifica"];
+const PUESTOS = ["Habla","Acompaña","Testifica","Cierra","Cierra"];
+const PUESTO_TXT = ["El que habla","El que acompaña","El que testifica","Quien cierra","Quien cierra"];
 const ESTADOS = ["Aleyo","Guerreros","Mano de Orula","Santo","Ifá"];
 const ORISHAS = ["Elegguá","Oggún","Ochosi","Obatalá","Yemayá","Changó","Oshún","Oyá","Orula","Babalú Ayé","Aganyú","Inle","Obba","Yewá","Naná Burukú","Egun"];
 let fichas = {};
@@ -2640,7 +2640,7 @@ function personasFiltradas(){
     return {...p, items};
   }).filter(p => p.items.length);
 }
-let est = {nombre: "", fecha: "", slots: [null, null, null], notas: {}, activo: 0, q: ""}, expAbierto = null, estMsg = "";
+let est = {nombre: "", fecha: "", slots: [null, null, null, null, null], notas: {}, activo: 0, q: ""}, expAbierto = null, estMsg = "";
 let estLecturas = {}, estLecturasCargando = new Set(), estCategoriaAbierta = "";
 let estSintesis = {}, estSintesisCargando = new Set(), estSintesisConsultada = new Set(), estSintesisError = new Set();
 async function cargarSintesisEstera(id){
@@ -2677,7 +2677,7 @@ function estSintesisHTML(id){
 }
 
 const hoy = () => new Date().toLocaleDateString("en-CA");
-function estReset(){ est = {nombre: "", fecha: hoy(), slots: [null, null, null], notas: {}, selecciones: {}, activo: 0, q: "", tipoConsulta: "consulta", ori: "", tipo: "", ebbo: "", ebboTxt: "", motivo: "", para: "", cumplido: "", acepto: "", refran: "", prohib: "", leyo: "", obraA: "", obraTipo: "", hace: "", resumen: "", seguimiento: "", proxima: "", fEstado: [], fOrisha: "", fIta: "", fichaDirty: false, fichaMsg: "", editId: null}; estMsg = ""; }
+function estReset(){ est = {nombre: "", fecha: hoy(), slots: [null, null, null, null, null], notas: {}, selecciones: {}, activo: 0, q: "", tipoConsulta: "consulta", ori: "", tipo: "", ebbo: "", ebboTxt: "", motivo: "", para: "", cumplido: "", acepto: "", refran: "", prohib: "", leyo: "", obraA: "", obraTipo: "", hace: "", resumen: "", seguimiento: "", proxima: "", fEstado: [], fOrisha: "", fIta: "", fichaDirty: false, fichaMsg: "", editId: null}; estMsg = ""; }
 estReset(); cargarBorrador();
 function estFalta(){
   if(!est.slots.some(Boolean)) return "Hace falta al menos un signo";
@@ -2946,7 +2946,7 @@ $("#rsFile").onchange = async ev => {
 function aLaEstera(id){
   let i = est.slots.findIndex(s => !s);
   if(est.slots.includes(id)) i = est.slots.indexOf(id);
-  if(i < 0){ alert("La estera ya tiene los tres signos. Quita uno para poner este."); setView("estera"); return; }
+  if(i < 0){ alert("La estera ya tiene los cinco signos. Quita uno para poner este."); setView("estera"); return; }
   est.slots[i] = id; const libre = est.slots.findIndex(s => !s); est.activo = libre >= 0 ? libre : i;
   setView("estera");
 }
@@ -2962,11 +2962,11 @@ document.addEventListener("keydown", e => {
   if(e.key === "ArrowRight"){ e.preventDefault(); moverSigno(1); }
 });
 function guardarBorrador(){ try{ const {q, ...x} = est; localStorage.setItem("odu.estera", JSON.stringify(x)); }catch(e){} }
-function cargarBorrador(){ try{ const d = JSON.parse(localStorage.getItem("odu.estera") || "null"); if(d && Array.isArray(d.slots)) est = {...est, ...d, selecciones:d.selecciones && typeof d.selecciones === "object" ? d.selecciones : {}, q: ""}; }catch(e){} }
+function cargarBorrador(){ try{ const d = JSON.parse(localStorage.getItem("odu.estera") || "null"); if(d && Array.isArray(d.slots)) est = {...est, ...d, slots:[0,1,2,3,4].map(i => d.slots[i] || null), selecciones:d.selecciones && typeof d.selecciones === "object" ? d.selecciones : {}, q: ""}; }catch(e){} }
 function abrirEnEstera(c){
   estReset();
   est.editId = c.id; est.nombre = c.persona || ""; est.fecha = c.fecha || hoy();
-  est.slots = [0,1,2].map(i => (c.signos||[])[i] || null); est.notas = {...(c.notas_signos||{})};
+  est.slots = [0,1,2,3,4].map(i => (c.signos||[])[i] || null); est.notas = {...(c.notas_signos||{})};
   est.selecciones = {...(c.selecciones||{})}; est.tipoConsulta = c.tipo_consulta || "consulta";
   est.activo = Math.max(0, est.slots.findIndex(s => !s)); if(est.slots.every(Boolean)) est.activo = 0;
   est.ori = c.orientacion || ""; est.tipo = c.orientacion_tipo || ""; est.ebbo = c.ebbo || ""; est.ebboTxt = c.ebbo_texto || "";
@@ -3094,14 +3094,15 @@ function renderEstera(){
   const n = est.slots.filter(Boolean).length;
   const falta = estFalta();
   const listo = !falta;
-  const visibles = est.slots[1] ? 3 : est.slots[0] ? 2 : 1;
+  const ultimo = est.slots.reduce((u,x,i) => x ? i : u, -1);
+  const visibles = Math.min(est.slots.length, Math.max(1, ultimo + 2, est.activo + 1));
   const act = est.slots[est.activo] || est.slots.find(Boolean);
   for(const id of est.slots.filter(Boolean)) cargarLecturaEstera(id);
   const res = buscarOdus(est.q);
   const lista = personasFiltradas();
   $("#main").innerHTML = `<div class="page">
     ${phead("Estera", `<button class="linkbtn muted" id="estOtra">Otra persona</button>`)}
-    <p class="sub">Registra la lectura de uno a tres signos de Ifá. Marca solamente lo confirmado para esta persona; la información de los libros es apoyo para el lector.<br><span style="font-size:.9rem">${estadoGuardado()}</span></p>
+    <p class="sub">Registra la lectura de uno a cinco signos de Ifá. Marca solamente lo confirmado para esta persona; la información de los libros es apoyo para el lector.<br><span style="font-size:.9rem">${estadoGuardado()}</span></p>
     <section class="blk"><h3><span class="est-step">1</span>Contexto de la consulta</h3>
       <div class="grid2">
         <div class="field"><label for="estTipoConsulta">Tipo de consulta</label><select id="estTipoConsulta"><option value="consulta" ${est.tipoConsulta==="consulta"?"selected":""}>Consulta ordinaria de Ifá</option><option value="ita" ${est.tipoConsulta==="ita"?"selected":""}>Itá de Ifá</option><option value="seguimiento" ${est.tipoConsulta==="seguimiento"?"selected":""}>Seguimiento</option><option value="otra" ${est.tipoConsulta==="otra"?"selected":""}>Otra lectura de Ifá</option></select></div>
@@ -3123,8 +3124,8 @@ function renderEstera(){
       ${(()=>{const pr = est.nombre.trim() ? prohibidoDe(claveDe(est.nombre)) : []; return pr.length ? `<p class="tlx"><b>Prohibido en sus letras:</b> ${pr.map(x=>esc(x.t)).join(" · ")}</p>` : "";})()}
       <div style="display:flex;gap:10px;align-items:center"><button class="linkbtn ${est.nombre.trim()?"":"muted"}" id="estFichaSave" ${est.nombre.trim()?"":"disabled"}>Guardar ficha</button><span class="muted" id="fichaMsg">${est.fichaMsg||""}</span></div>
     </section>
-    <section class="blk"><h3><span class="est-step">2</span>Signos de esta lectura</h3><p class="est-hint">Elige el signo que habla y, si corresponde, los que acompañan y testifican. Toca una ficha para escribir su nota.</p></section>
-    <div class="slots" style="grid-template-columns:${[1.5,1,1].slice(0, visibles).map(x=>`minmax(0,${x}fr)`).join(" ")}">${est.slots.slice(0, visibles).map((s,i) => {
+    <section class="blk"><h3><span class="est-step">2</span>Signos de esta lectura</h3><p class="est-hint">Elige el signo que habla y, si corresponde, los que acompañan, testifican y cierran. Toca una ficha para escribir su nota.</p></section>
+    <div class="slots" style="grid-template-columns:${[1.5,1,1,1,1].slice(0, visibles).map(x=>`minmax(0,${x}fr)`).join(" ")}">${est.slots.slice(0, visibles).map((s,i) => {
       const o = s && odus.find(x => x.id === s);
       const lib = s ? libreta[s] : null;
       return `<div class="slot ${i===0?"habla":""} ${i===est.activo?"on":""} ${o?"full":""}" data-slot="${i}" role="button" tabindex="0" aria-label="${PUESTO_TXT[i]}">
