@@ -1854,7 +1854,7 @@ es: {
   "perfil.privacidadTxt":"Tus favoritos, notas y consultas son privados: nadie más puede verlos, ni los administradores desde la página.",
   "perfil.descargarDatos":"Descargar todos mis datos","perfil.cerrarSesion":"Cerrar sesión","perfil.eliminarCuenta":"Eliminar mi cuenta",
   "perfil.arco":"Para ejercer tus derechos ARCO o consultar cómo tratamos tus datos, revisa el","perfil.y":"y la",
-  "canticos.titulo":"Cánticos y rezos","canticos.sub":"Cantos, suyerés, orikìs, adurás, invocaciones y rezos — cada fuente queda como su propia versión, identificada por libro.",
+  "canticos.titulo":"Cánticos y rezos","canticos.sub":"Cantos, suyerés, orikìs, adurás, invocaciones y rezos.",
   "canticos.buscarPh":"Buscar por título, orichá o texto…","canticos.todosTipos":"Todos los tipos",
   "vocabulario.titulo":"Vocabulario","vocabulario.sub":"Términos yorùbá, rituales, plantas, animales, cargos religiosos y Òrìṣà. Si dos fuentes dan significados distintos, se muestran ambas.",
   "vocabulario.buscarPh":"Buscar término…","vocabulario.todasCategorias":"Todas las categorías",
@@ -2105,13 +2105,7 @@ async function adminCargar(){
 let canQ = "", canTipo = "", canResults = [], canLoading = false, canDone = false, canSel = null, canTimer = null, canEditing = null, canErr = "";
 
 function fuenteVisible(libro){
-  const nombre=String(libro || "").normalize("NFC").trim();
-  const ocultas=new Set([
-    "Conjunto de información (compilación Ifadowole - Bádé Ajàyí y fuentes asociadas)",
-    "1000 Orisa/Yorùbá Names - Chief FAMA",
-    "Rezos de los 256 Oddun de Ifá"
-  ]);
-  return ocultas.has(nombre) ? "" : nombre;
+  return "";
 }
 
 const CAN_TIPOS = [["","Todos los tipos"],["canto","Canto"],["suyere","Suyeré"],["oriki","Orikì"],["adura","Adurá"],["invocacion","Invocación"],["rezo","Rezo"]];
@@ -2443,7 +2437,7 @@ function renderEstudios(){
   if(artSel){
     const a = artSel;
     $("#main").innerHTML = `<div class="page">${palabrasTabs()}${phead(a.tema)}
-      <p class="muted" style="margin:0 0 14px">${a.seccion?esc(a.seccion)+" · ":""}${esc(a.libro)}</p>
+      <p class="muted" style="margin:0 0 14px">${a.seccion?esc(a.seccion):""}</p>
       ${LANG==="en" && !a.texto_en?`<p class="muted" style="font-size:.88rem;margin:0 0 10px">English translation not available for this article yet — showing Spanish original.</p>`:""}
       <div class="box"><p class="prose" style="white-space:pre-line">${esc(bi(a,"texto","texto_en"))}</p></div>
       ${a.notas?`<div class="box" style="margin-top:14px"><p class="lbl">${LANG==="en"?"Notes":"Notas"}</p><p class="prose" style="white-space:pre-line">${esc(a.notas)}</p></div>`:""}
@@ -2462,7 +2456,7 @@ function renderEstudios(){
       ${canWrite?`<button class="btn" id="artImportar">Importar texto</button>`:""}
     </div>
     ${artEditing==='import'?artImportHTML():""}
-    ${artLoading?`<p class="muted">${tr("common.buscando")}</p>`:artDone?`<div class="cards">${artResults.map(a=>{const prev = bi(a,"texto","texto_en")||"";return `<button class="card" data-art="${esc(a.id)}"><div class="top"><span class="who">${esc(a.tema)}</span></div><p class="meta" style="margin:4px 0">${a.seccion?esc(a.seccion)+" · ":""}${esc(a.libro)}</p><p style="margin:6px 0 0">${esc(prev.slice(0,140))}${prev.length>140?"…":""}</p></button>`;}).join("")||`<div class="box"><p style="margin:0">${LANG==="en"?"No articles yet.":"Todavía no hay artículos."}</p></div>`}</div>`:`<div class="box"><p style="margin:0">${tr("common.cargando")}</p></div>`}
+    ${artLoading?`<p class="muted">${tr("common.buscando")}</p>`:artDone?`<div class="cards">${artResults.map(a=>{const prev = bi(a,"texto","texto_en")||"";return `<button class="card" data-art="${esc(a.id)}"><div class="top"><span class="who">${esc(a.tema)}</span></div><p class="meta" style="margin:4px 0">${a.seccion?esc(a.seccion):""}</p><p style="margin:6px 0 0">${esc(prev.slice(0,140))}${prev.length>140?"…":""}</p></button>`;}).join("")||`<div class="box"><p style="margin:0">${LANG==="en"?"No articles yet.":"Todavía no hay artículos."}</p></div>`}</div>`:`<div class="box"><p style="margin:0">${tr("common.cargando")}</p></div>`}
   </div>`;
   const inp = $("#artInput"); inp.oninput = () => { artQ = inp.value; clearTimeout(artTimer); artTimer = setTimeout(artBuscar, 350); };
   const im = $("#artImportar"); if(im) im.onclick = () => { artEditing = 'import'; artErr=""; renderDetail(); };
