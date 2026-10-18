@@ -992,7 +992,7 @@ function contentHTML(o){
 function contenidoUnificadoHTML(){
   const fichas = Object.values(textos).filter(hasText);
   if(!fichas.length && !oduCanticos.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
-  const campos = [["caracterizacion","Caracterización"],["wo","WO · Entorno actual"],["caracteristicas","Características generales"],["consejo","Consejo"]];
+  const campos = [["caracterizacion","Caracterización"],["wo","WO · Entorno actual"],["caracteristicas","Características generales"]];
   const oEst = odus.find(x => x.id === current), fichaEst = estSintesis?.[oEst?.numero];
   if(oEst && !fichaEst) cargarSintesisEstera(current);
   const woEst = fichaEst?.secciones?.find(s => /^WO\b/.test(s.titulo || ""));
@@ -1017,10 +1017,10 @@ function contenidoUnificadoHTML(){
     return entradas.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${entradas.map(x => `<div class="box"><p class="lbl">${esc(x.ref)}</p><p class="prose">${esc(x.texto)}</p></div>`).join("")}</section>` : "";
   }).join("");
   const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos y relatos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<div><p class="lbl">Yorùbá</p><p class="prose yo">${esc(v.yoruba)}</p></div>`:""}${v.traduccion?`<div><p class="lbl">Traducción</p><p class="prose">${esc(v.traduccion)}</p></div>`:""}${v.comentario?`<div><p class="lbl">Relato o comentario</p><p class="prose">${esc(v.comentario)}</p></div>`:""}</article>`).join("")}</section>` : "";
-  const contenido = bloques.replace(/(<section class="block" id="s-wo">[\s\S]*?<\/section>)/, m => m + hablanHTML) + (bloques.includes('id="s-wo"') ? "" : hablanHTML) + temas + versoHTML;
+  // Pestaña Odù: solo Caracterización, WO y Versos y relatos. Todo lo demás se ve en Estera.
+  const contenido = bloques + versoHTML;
   const enlaces = [...contenido.matchAll(/<section class="block" id="s-([^"]+)"><h2>([^<]+)<\/h2>/g)]
     .map(([,id,titulo]) => `<a href="#s-${id}">${titulo}</a>`);
-  if(oduCanticos.length) enlaces.push(`<a href="#s-rezos">Rezos y cánticos</a>`);
   return (enlaces.length ? `<nav class="jump" aria-label="Secciones">${enlaces.join("")}</nav>` : "") + contenido;
 }
 function nombresSoloReferencia(){
@@ -1102,7 +1102,7 @@ function renderDetailInner(){
       </div>
     </header>
     ${contentHTML(o)}
-    ${oduCanticosHTML()}
+    ${activeBook() === "todos" ? "" : oduCanticosHTML()}
     ${libretaHTML(o)}
     ${user?`<section class="mynote"><p class="lbl">Mis notas sobre ${esc(o.nombre)} (privadas)</p><textarea id="myNote" placeholder="Escribe aquí tus notas personales">${esc(notaOdu[o.id] ?? "")}</textarea><div style="display:flex;gap:10px;align-items:center;margin-top:8px"><button class="btn" id="btnNote">Guardar nota</button><span class="muted" id="noteMsg"></span></div></section>`:""}`;
   bindOduUserTools(o); bindLibreta(o);
