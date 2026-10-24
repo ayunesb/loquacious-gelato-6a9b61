@@ -990,38 +990,52 @@ function contentHTML(o){
     ${b.cita?`<footer class="cite"><p class="lbl">Fuente</p><p>${esc(b.cita)}</p></footer>`:""}`;
 }
 function contenidoUnificadoHTML(){
+  const EN = LANG === "en";
   const fichas = Object.values(textos).filter(hasText);
-  if(!fichas.length && !oduCanticos.length) return `<div class="nobook"><p>Este Odù todavía no tiene contenido cargado.</p></div>`;
-  const campos = [["caracterizacion","Caracterización"],["wo","WO · Entorno actual"],["caracteristicas","Características generales"]];
+  if(!fichas.length && !oduCanticos.length) return `<div class="nobook"><p>${EN?"This Odù has no content loaded yet.":"Este Odù todavía no tiene contenido cargado."}</p></div>`;
+  const campos = [["caracterizacion",EN?"Characterization":"Caracterización"],["wo",EN?"WO · Current situation":"WO · Entorno actual"],["caracteristicas",EN?"General characteristics":"Características generales"]];
   const oEst = odus.find(x => x.id === current), fichaEst = estSintesis?.[oEst?.numero];
   if(oEst && !fichaEst) cargarSintesisEstera(current);
   const woEst = fichaEst?.secciones?.find(s => /^WO\b/.test(s.titulo || ""));
   const hablanEst = fichaEst?.secciones?.find(s => s.hablan?.length)?.hablan || [];
-  const hablanHTML = hablanEst.length ? `<section class="block" id="s-hablan"><h2>Entidades mencionadas en el material del Odù</h2><div class="box"><p class="prose">${hablanEst.map(esc).join(" · ")}</p><p class="muted" style="margin:6px 0 0;font-size:.85em">Su mención no significa necesariamente que aconsejen en la consulta.</p></div></section>` : "";
+  let faltaEn = false;
+  const enTxt = (obj, k) => { if(!EN) return obj?.[k] || ""; const v = obj?.[k + "_en"]; if(v && String(v).trim()) return v; if(obj?.[k] && String(obj[k]).trim()) faltaEn = true; return obj?.[k] || ""; };
+  const hablanHTML = hablanEst.length ? `<section class="block" id="s-hablan"><h2>${EN?"Entities mentioned in this Odù's material":"Entidades mencionadas en el material del Odù"}</h2><div class="box"><p class="prose">${hablanEst.map(esc).join(" · ")}</p><p class="muted" style="margin:6px 0 0;font-size:.85em">${EN?"Being mentioned does not necessarily mean they give advice in the reading.":"Su mención no significa necesariamente que aconsejen en la consulta."}</p></div></section>` : "";
   const bloques = campos.map(([clave,titulo]) => {
     if(clave === "wo" && woEst){
-      return `<section class="block" id="s-wo"><h2>${esc(woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(woEst.texto)}</p>`:""}${woEst.puntos?.length?`<ul class="prose">${woEst.puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(woEst.cierre)}</p>`:""}</div></section>`;
+      const puntos = EN && woEst.puntos_en?.length ? woEst.puntos_en : (woEst.puntos || []);
+      if(EN && woEst.puntos?.length && !woEst.puntos_en?.length) faltaEn = true;
+      return `<section class="block" id="s-wo"><h2>${esc(EN ? (woEst.titulo_en || "WO") : woEst.titulo)}</h2><div class="box">${woEst.texto?`<p class="prose">${esc(enTxt(woEst,"texto"))}</p>`:""}${puntos.length?`<ul class="prose">${puntos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${woEst.cierre?`<p class="prose">${esc(enTxt(woEst,"cierre"))}</p>`:""}</div></section>`;
     }
-    const valores = [...new Set(fichas.map(t => (t[clave] || "").trim()).filter(Boolean))];
-    const soloNombres = clave === "caracteristicas" && valores.length && valores.every(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v));
-    return valores.length && !soloNombres ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">Versión ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
+    const valores = [...new Set(fichas.map(t => (enTxt(t, clave) || "").trim()).filter(Boolean))];
+    const soloNombres = clave === "caracteristicas" && valores.length && valores.every(v => /^(Otros nombres|Other names):\s*[^.\n]+\.?$/i.test(v));
+    return valores.length && !soloNombres ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${valores.map((v,i) => `<div class="box">${valores.length>1?`<p class="lbl">${EN?"Version":"Versión"} ${i+1}</p>`:""}<p class="prose">${esc(v)}</p></div>`).join("")}</section>` : "";
   }).join("");
   const vistos = new Set(), versos = [];
-  for(const ficha of fichas) for(const v of (ficha.versos || [])){
+  for(const ficha of fichas) (ficha.versos || []).forEach((v0, i) => {
+    let v = v0;
+    if(EN){
+      const e = (ficha.versos_en || [])[i] || {};
+      v = {...v0};
+      for(const k of ["traduccion","comentario","medicina","ebbo","hierbas","orichas","canticos"]){
+        if(e[k] && String(e[k]).trim()) v[k] = e[k]; else if(v0[k] && String(v0[k]).trim()) faltaEn = true;
+      }
+    }
     const clave = JSON.stringify([v.ref,v.yoruba,v.traduccion,v.comentario,v.ebbo,v.hierbas,v.canticos,v.medicina,v.orichas]);
     if(!vistos.has(clave)){ vistos.add(clave); versos.push(v); }
-  }
-  const datos = [["ebbo","Ebós"],["hierbas","Plantas y hierbas"],["orichas","Orichas relacionados"],["canticos","Cánticos"],["medicina","Medicina de Ifá"]];
+  });
+  const datos = [["ebbo",EN?"Ebós":"Ebós"],["hierbas",EN?"Plants and herbs":"Plantas y hierbas"],["orichas",EN?"Related Orishas":"Orichas relacionados"],["canticos",EN?"Chants":"Cánticos"],["medicina",EN?"Ifá medicine":"Medicina de Ifá"]];
   const temas = datos.map(([clave,titulo]) => {
-    const entradas = versos.map((v,i) => ({ref:v.ref || `Verso ${i+1}`, texto:(v[clave] || "").trim()})).filter(x => x.texto);
+    const entradas = versos.map((v,i) => ({ref:v.ref || `${EN?"Verse":"Verso"} ${i+1}`, texto:(v[clave] || "").trim()})).filter(x => x.texto);
     return entradas.length ? `<section class="block" id="s-${clave}"><h2>${titulo}</h2>${entradas.map(x => `<div class="box"><p class="lbl">${esc(x.ref)}</p><p class="prose">${esc(x.texto)}</p></div>`).join("")}</section>` : "";
   }).join("");
-  const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>Versos y relatos</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `Verso ${i+1}`)}</h3>${v.yoruba?`<div><p class="lbl">Yorùbá</p><p class="prose yo">${esc(v.yoruba)}</p></div>`:""}${v.traduccion?`<div><p class="lbl">Traducción</p><p class="prose">${esc(v.traduccion)}</p></div>`:""}${v.comentario?`<div><p class="lbl">Relato o comentario</p><p class="prose">${esc(v.comentario)}</p></div>`:""}</article>`).join("")}</section>` : "";
+  const versoHTML = versos.length ? `<section class="block" id="s-versos"><h2>${EN?"Verses and stories":"Versos y relatos"}</h2>${versos.map((v,i) => `<article class="verse"><h3>${esc(v.ref || `${EN?"Verse":"Verso"} ${i+1}`)}</h3>${v.yoruba?`<div><p class="lbl">Yorùbá</p><p class="prose yo">${esc(v.yoruba)}</p></div>`:""}${v.traduccion?`<div><p class="lbl">${EN?"Translation":"Traducción"}</p><p class="prose">${esc(v.traduccion)}</p></div>`:""}${v.comentario?`<div><p class="lbl">${EN?"Story or commentary":"Relato o comentario"}</p><p class="prose">${esc(v.comentario)}</p></div>`:""}</article>`).join("")}</section>` : "";
   // Pestaña Odù: solo Caracterización, WO y Versos y relatos. Todo lo demás se ve en Estera.
+  const aviso = EN ? `<div class="box" style="margin-bottom:14px"><p class="muted" style="margin:0;font-size:.88rem">${faltaEn?"English translation in progress: parts not yet translated are shown in the original Spanish. ":""}The English text is a translation of the Spanish sources; the original Spanish remains the reference.</p></div>` : "";
   const contenido = bloques + versoHTML;
   const enlaces = [...contenido.matchAll(/<section class="block" id="s-([^"]+)"><h2>([^<]+)<\/h2>/g)]
     .map(([,id,titulo]) => `<a href="#s-${id}">${titulo}</a>`);
-  return (enlaces.length ? `<nav class="jump" aria-label="Secciones">${enlaces.join("")}</nav>` : "") + contenido;
+  return aviso + (enlaces.length ? `<nav class="jump" aria-label="${EN?"Sections":"Secciones"}">${enlaces.join("")}</nav>` : "") + contenido;
 }
 function nombresSoloReferencia(){
   return [...new Set(Object.values(textos).filter(hasText).map(t => (t.caracteristicas || "").trim()).filter(v => /^Otros nombres:\s*[^.\n]+\.?$/i.test(v)).map(v => v.replace(/^Otros nombres:\s*/i, "")))];
@@ -1447,7 +1461,7 @@ function estadoGuardado(){
 const sortOdus = () => odus.sort((a,b)=>a.numero-b.numero);
 const sortLibros = () => libros.sort((a,b)=>(a.orden||0)-(b.orden||0));
 const oduFromRow = r => ({id:r.id, numero:r.numero, nombre:r.nombre, otrosNombres:r.otros_nombres, derecha:r.derecha, izquierda:r.izquierda, foto:r.foto});
-const textoFromRow = r => ({oduId:r.odu_id, libro:r.libro, caracterizacion:r.caracterizacion, wo:r.wo, caracteristicas:r.caracteristicas, consejo:r.consejo, versos:r.versos||[]});
+const textoFromRow = r => ({oduId:r.odu_id, libro:r.libro, caracterizacion:r.caracterizacion, wo:r.wo, caracteristicas:r.caracteristicas, consejo:r.consejo, versos:r.versos||[], caracterizacion_en:r.caracterizacion_en||"", caracteristicas_en:r.caracteristicas_en||"", versos_en:r.versos_en||[]});
 async function saveOdu(id, d){
   must(await sb.from("odus").upsert({id, numero:d.numero, nombre:d.nombre, otros_nombres:d.otrosNombres||"", derecha:d.derecha||"", izquierda:d.izquierda||"", foto:d.foto||"", actualizado:new Date().toISOString()}));
   const i = odus.findIndex(o=>o.id===id); const rec = {id, ...d};
@@ -2666,13 +2680,20 @@ function estTextoPasajeHTML(texto){
   return String(texto || "").split(/\n\s*\n/).filter(p=>p.trim()).map(p=>`<p class="est-pasaje-texto" style="white-space:pre-line">${esc(p)}</p>`).join("");
 }
 function estPasajeHTML(p){
-  const campos=[["texto",""],["yoruba","Yorùbá"],["texto_ritual","Texto ritual"],["traduccion","Traducción"],["comentario","Notas del relato"]];
-  const cuerpo=campos.filter(([k])=>typeof p[k]==="string" && p[k].trim()).map(([k,label])=>`${label?`<p class="lbl">${label}</p>`:""}${estTextoPasajeHTML(p[k])}`).join("");
+  const EN = LANG === "en";
+  const campos=[["texto",""],["yoruba","Yorùbá"],["texto_ritual",EN?"Ritual text":"Texto ritual"],["traduccion",EN?(p.traduccion_en?"Translation":"Translation (Spanish)"):"Traducción"],["comentario",EN?"Notes on the story":"Notas del relato"]];
+  const val = k => k === "yoruba" ? p[k] : (EN && typeof p[k + "_en"] === "string" && p[k + "_en"].trim() ? p[k + "_en"] : p[k]);
+  const cuerpo=campos.filter(([k])=>typeof val(k)==="string" && val(k).trim()).map(([k,label])=>`${label?`<p class="lbl">${label}</p>`:""}${estTextoPasajeHTML(val(k))}`).join("");
   if(!cuerpo)return "";
-  return `<details class="mas est-pasaje" ${p.origen_id?`id="pasaje-${esc(p.origen_id)}"`:""}><summary>${esc(p.titulo || "Pasaje")}</summary><div>${cuerpo}</div></details>`;
+  return `<details class="mas est-pasaje" ${p.origen_id?`id="pasaje-${esc(p.origen_id)}"`:""}><summary>${esc((EN && p.titulo_en) || p.titulo || (EN?"Passage":"Pasaje"))}</summary><div>${cuerpo}</div></details>`;
 }
 function estSeccionesHTML(secciones){
-  return (secciones || []).filter(s=>s.texto?.trim() || s.puntos?.some(p=>p.trim()) || s.pasajes?.length).map(s=>`<section><h4>${esc(s.titulo)}${s.pasajes?.length?` <span class="muted" style="font-size:.7em">· ${s.pasajes.length}</span>`:""}</h4>${s.introduccion?`<p>${esc(s.introduccion)}</p>`:""}${s.texto?estTextoPasajeHTML(s.texto):""}${s.puntos?.length?`<ul>${s.puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${s.hablan?.length?`<p><b>Entidades mencionadas en el material del Odù:</b> ${s.hablan.map(esc).join(" · ")}</p>`:""}${(s.pasajes || []).map(estPasajeHTML).join("")}${s.cierre?`<p>${esc(s.cierre)}</p>`:""}</section>`).join("");
+  const EN = LANG === "en";
+  const t = (s,k) => EN && typeof s[k + "_en"] === "string" && s[k + "_en"].trim() ? s[k + "_en"] : s[k];
+  return (secciones || []).filter(s=>s.texto?.trim() || s.puntos?.some(p=>p.trim()) || s.pasajes?.length).map(s=>{
+    const puntos = EN && s.puntos_en?.length ? s.puntos_en : (s.puntos || []);
+    return `<section><h4>${esc(t(s,"titulo"))}${s.pasajes?.length?` <span class="muted" style="font-size:.7em">· ${s.pasajes.length}</span>`:""}</h4>${s.introduccion?`<p>${esc(t(s,"introduccion"))}</p>`:""}${s.texto?estTextoPasajeHTML(t(s,"texto")):""}${puntos.length?`<ul>${puntos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${s.hablan?.length?`<p><b>${EN?"Entities mentioned in this Odù's material:":"Entidades mencionadas en el material del Odù:"}</b> ${s.hablan.map(esc).join(" · ")}</p>`:""}${(s.pasajes || []).map(estPasajeHTML).join("")}${s.cierre?`<p>${esc(t(s,"cierre"))}</p>`:""}</section>`;
+  }).join("");
 }
 function estSintesisHTML(id){
   const o=odus.find(x=>x.id===id), ficha=estSintesis?.[o?.numero];
